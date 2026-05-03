@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>LWorks Multi Service Hub — Sussex, Lisbon, Lake Country WI</title>
+  <meta name="description" content="LWorks Multi Service Hub — Window cleaning, lawn care, auto services, pressure washing & more. We come to you. Serving Sussex, Lisbon, Lake Country & surrounding areas, WI."/>
+  <meta name="robots" content="index, follow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init('ojcDVPCld5mc6jCXf');</script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-logo">
+    <a href="#"><img src="images/logo-light.png" alt="LWorks Multi Service Hub"/></a>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="#services">Services</a>
+    <a href="#estimate">Get Estimate</a>
+    <a href="#about">About</a>
+    <a href="#estimate" class="nav-cta">Book Now</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home" aria-labelledby="heroHeading">
+  <!-- Shield watermark -->
+  <div class="hero-shield-bg" aria-hidden="true">
+    <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="shG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2db54b"/>
+          <stop offset="50%" stop-color="#29a9e0"/>
+          <stop offset="100%" stop-color="#5b2fc9"/>
+        </linearGradient>
+      </defs>
+      <path d="M110 8 L195 42 L195 120 Q195 185 110 226 Q25 185 25 120 L25 42 Z" fill="url(#shG)"/>
+      <path d="M110 22 L182 52 L182 120 Q182 172 110 210 Q38 172 38 120 L38 52 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <rect x="68" y="42" width="76" height="76" rx="5" fill="none" stroke="#fff" stroke-width="3" opacity="0.9"/>
+      <line x1="106" y1="42" x2="106" y2="118" stroke="#fff" stroke-width="2" opacity="0.7"/>
+      <line x1="68" y1="80" x2="144" y2="80" stroke="#fff" stroke-width="2" opacity="0.7"/>
+      <g transform="translate(87,61)">
+        <path d="M0,-10 L2,-2 L10,0 L2,2 L0,10 L-2,2 L-10,0 L-2,-2 Z" fill="#fff" opacity="0.95"/>
+      </g>
+      <path d="M38 168 Q32 140 28 128 Q34 134 40 152 Q44 136 50 126 Q54 140 48 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M62 168 Q58 146 54 136 Q60 142 64 156 Q68 142 73 132 Q76 146 71 168Z" fill="#3dc856" opacity="0.95"/>
+      <path d="M88 168 Q84 148 81 138 Q87 144 90 158 Q94 144 99 134 Q102 148 97 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M114 168 Q110 150 108 140 Q113 146 115 158 Q119 146 124 136 Q127 150 122 168Z" fill="#3dc856" opacity="0.95"/>
+      <path d="M138 168 Q135 153 133 144 Q138 150 139 162 Q143 150 148 142 Q151 155 146 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M30 178 Q110 160 190 172" stroke="#2db54b" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.9"/>
+      <path d="M30 178 Q110 160 190 172" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.35"/>
+    </svg>
+  </div>
+
+  <div class="hero-left">
+    <div class="pill">📍 Sussex · Lisbon · Lake Country &amp; Surrounding Areas, WI</div>
+
+    <!-- L wordmark — geometric SVG, purple→blue gradient, 4-point star -->
+    <div class="hero-wm" id="heroHeading">
+      <span>
+        <svg width="52" height="66" viewBox="0 0 52 66" style="display:block;margin-bottom:-2px;" aria-hidden="true">
+          <defs>
+            <linearGradient id="heroLgrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#5b2fc9"/>
+              <stop offset="100%" stop-color="#29a9e0"/>
+            </linearGradient>
+          </defs>
+          <!-- Geometric L: thick vertical bar + horizontal foot -->
+          <rect x="4" y="4" width="14" height="52" rx="2" fill="url(#heroLgrad)"/>
+          <rect x="4" y="46" width="36" height="10" rx="2" fill="url(#heroLgrad)"/>
+          <!-- 4-pointed cross star, upper right -->
+          <g transform="translate(34,14)">
+            <path d="M0,-11 L2.2,-2.2 L11,0 L2.2,2.2 L0,11 L-2.2,2.2 L-11,0 L-2.2,-2.2 Z" fill="#c8e8ff" opacity="0.85"/>
+            <path d="M0,-8 L1.6,-1.6 L8,0 L1.6,1.6 L0,8 L-1.6,1.6 L-8,0 L-1.6,-1.6 Z" fill="#ffffff"/>
+          </g>
+        </svg>
+      </span>
+      <span class="hero-works">WORKS</span>
+    </div>
+
+    <div class="hero-tag">Multi Service Hub</div>
+    <p class="hero-sub">Skilled, equipped, and ready to come to you. Home, lawn, and auto care — handled right at your property, no hauling required.</p>
+    <div class="hero-btns">
+      <a href="#estimate" class="btn-primary">Get a Free Estimate</a>
+      <a href="#services" class="btn-outline">See Our Services</a>
+    </div>
+    <div class="trust">
+      <div class="tc"><div class="td"></div> We Come to You</div>
+      <div class="tc"><div class="td"></div> Transparent Pricing</div>
+      <div class="tc"><div class="td td-pu"></div> Bundle &amp; Save</div>
+    </div>
+  </div>
+
+  <div class="hero-right" aria-hidden="true">
+    <img class="hero-logo-img" src="images/logo-light.png" alt="LWorks logo"/>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services" aria-labelledby="servicesHeading">
+  <div class="sec-label">What We Offer</div>
+  <div class="sec-title" id="servicesHeading">10+ Services, <span class="grad">Your Property</span></div>
+  <div class="sec-sub">From windows to driveways to your lawn — skilled, reliable work handled right where you are.</div>
+
+  <div class="cards">
+    <!-- Exterior -->
+    <div class="card c-bl">
+      <div class="ca"></div>
+      <div class="cb">
+        <div class="card-icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="2" y="2" width="28" height="28" rx="3" stroke="#29a9e0" stroke-width="2.5"/>
+            <line x1="16" y1="2" x2="16" y2="30" stroke="#29a9e0" stroke-width="2"/>
+            <line x1="2" y1="16" x2="30" y2="16" stroke="#29a9e0" stroke-width="2"/>
+            <path d="M9,9 L10.5,5.5 L12,9 L15.5,10.5 L12,12 L10.5,15.5 L9,12 L5.5,10.5 Z" fill="#29a9e0"/>
+          </svg>
+        </div>
+        <div class="cn">Exterior Cleaning</div>
+        <div class="cp">Starting at $80</div>
+        <ul class="cl">
+          <li>Window Cleaning</li>
+          <li>Screen Cleaning</li>
+          <li>Gutter Cleaning</li>
+          <li>Pressure Washing</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Lawn -->
+    <div class="card c-gn">
+      <div class="ca"></div>
+      <div class="cb">
+        <div class="card-icon-wrap"><span style="font-size:28px;" aria-hidden="true">🌿</span></div>
+        <div class="cn">Lawn Care</div>
+        <div class="cp">Starting at $40</div>
+        <ul class="cl">
+          <li>Mowing (Trim &amp; Blow)</li>
+          <li>Pruning &amp; Tree Trimming</li>
+          <li>Property Cleanup</li>
+          <li>Plant Watering</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Auto -->
+    <div class="card c-pu">
+      <div class="ca"></div>
+      <div class="cb">
+        <div class="card-icon-wrap"><span style="font-size:28px;" aria-hidden="true">🔧</span></div>
+        <div class="cn">Auto Services</div>
+        <div class="cp">Starting at $60</div>
+        <ul class="cl">
+          <li>Oil Changes</li>
+          <li>Disc Brake Service</li>
+          <li>Interior Detailing</li>
+        </ul>
+        <p style="font-size:11px;color:#8a95a8;margin-top:8px;">In-driveway · parts quoted separately</p>
+      </div>
+    </div>
+
+    <!-- Additional -->
+    <div class="card c-am">
+      <div class="ca"></div>
+      <div class="cb">
+        <div class="card-icon-wrap"><span style="font-size:28px;" aria-hidden="true">⚡</span></div>
+        <div class="cn">Additional</div>
+        <div class="cp">Starting at $60</div>
+        <ul class="cl">
+          <li>Carpet Cleaning</li>
+          <li>Local Hauling</li>
+          <li>Seasonal &amp; Winter</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bundle-banner">
+    <div class="bb-icon">💰</div>
+    <div class="bb-text">
+      <strong>Bundle &amp; Save — Combine Services, One Visit</strong>
+      <span>Book multiple services together and get a bundled discount automatically applied to your estimate.</span>
+    </div>
+    <a href="#estimate" class="btn-primary" style="font-size:13px;padding:9px 18px;">Build My Bundle</a>
+  </div>
+
+  <div class="svc-chips">
+    <div class="svc-chip">🪟 4 Exterior Services</div>
+    <div class="svc-chip">🌿 4 Lawn Services</div>
+    <div class="svc-chip">🔧 3 Auto Services</div>
+    <div class="svc-chip">⚡ 3 Additional Services</div>
+  </div>
+</section>
+
+<!-- ESTIMATE TOOL -->
+<section class="estimate" id="estimate" aria-labelledby="estimateHeading">
+  <div class="sec-label">Free &amp; Instant</div>
+  <div class="sec-title" id="estimateHeading">Get Your Estimate</div>
+  <div class="sec-sub" style="text-align:center;margin:0 auto 32px;max-width:480px;">Pick your exact services, tell us about your property — get a detailed line-by-line estimate, then book right to the calendar.</div>
+
+  <div class="est-wrap">
+    <!-- Step indicators -->
+    <div class="steps-row" role="list">
+      <div class="st active" id="si1" role="listitem"><div class="sn">1</div><div class="sl">Your Info</div></div>
+      <div class="st-line" id="ln1"></div>
+      <div class="st inactive" id="si2" role="listitem"><div class="sn">2</div><div class="sl">Services</div></div>
+      <div class="st-line" id="ln2"></div>
+      <div class="st inactive" id="si3" role="listitem"><div class="sn">3</div><div class="sl">Property</div></div>
+      <div class="st-line" id="ln3"></div>
+      <div class="st inactive" id="si4" role="listitem"><div class="sn">4</div><div class="sl">Estimate</div></div>
+    </div>
+
+    <div class="form-box">
+
+      <!-- STEP 1: Contact info -->
+      <div class="sp active" id="p1">
+        <div class="ft">Let's start with your info</div>
+        <div class="fh">We'll send your estimate here and reach out to confirm details.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fname">First Name *</label>
+            <input type="text" id="fname" placeholder="John" autocomplete="given-name"/>
+          </div>
+          <div class="form-group">
+            <label for="lname">Last Name *</label>
+            <input type="text" id="lname" placeholder="Smith" autocomplete="family-name"/>
+          </div>
+          <div class="form-group">
+            <label for="femail">Email Address *</label>
+            <input type="email" id="femail" placeholder="john@email.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label for="fphone">Phone Number</label>
+            <input type="tel" id="fphone" placeholder="(262) 555-0100" autocomplete="tel"/>
+          </div>
+          <div class="form-group full">
+            <label for="faddress">Service Address *</label>
+            <input type="text" id="faddress" placeholder="123 Main St, Sussex WI 53089" autocomplete="street-address"/>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="nextStep1()">Next: Choose Services →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Granular service selection -->
+      <div class="sp" id="p2">
+        <div class="ft">Which services do you need?</div>
+        <div class="fh">Tap to expand each category and select specific services. Combining 2+ categories saves you money.</div>
+
+        <div id="catContainer"></div>
+
+        <div class="bundle-note" id="bn">
+          🎉 <span>You qualify for a <strong>bundle discount</strong> — savings will show in your estimate!</span>
+        </div>
+
+        <div class="sel-summary" id="selSummary" style="margin-top:8px;">Select at least one service below</div>
+
+        <div class="fa">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-primary" onclick="nextStep2()">Next: Property Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Property -->
+      <div class="sp" id="p3">
+        <div class="ft">Tell us about your property</div>
+        <div class="fh">This helps us give you the most accurate estimate possible.</div>
+
+        <div class="prop-lbl">Property / Lot Size</div>
+        <div class="po">
+          <div class="popt" onclick="selProp(this,'size')" data-val="sm">Small<br><span style="font-size:10px;font-weight:400">Under ¼ acre</span></div>
+          <div class="popt sel" onclick="selProp(this,'size')" data-val="md">Medium<br><span style="font-size:10px;font-weight:400">¼–½ acre</span></div>
+          <div class="popt" onclick="selProp(this,'size')" data-val="lg">Large<br><span style="font-size:10px;font-weight:400">½–1 acre</span></div>
+          <div class="popt" onclick="selProp(this,'size')" data-val="xl">Extra Large<br><span style="font-size:10px;font-weight:400">1+ acre</span></div>
+        </div>
+
+        <div class="prop-lbl">Home Type</div>
+        <div class="po">
+          <div class="popt sel" onclick="selProp(this,'type')" data-val="single">Single Family</div>
+          <div class="popt" onclick="selProp(this,'type')" data-val="multi">Multi-Family</div>
+          <div class="popt" onclick="selProp(this,'type')" data-val="condo">Condo / Townhome</div>
+          <div class="popt" onclick="selProp(this,'type')" data-val="commercial">Commercial</div>
+        </div>
+
+        <label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label>
+        <textarea id="fnotes" placeholder="e.g. 2-story home, 3-car garage, gate code, preferred timing…"></textarea>
+
+        <div class="fa">
+          <button class="btn-back" onclick="goStep(2)">← Back</button>
+          <button class="btn-primary" onclick="buildEstimate()">Build My Estimate →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Estimate result (populated by JS) -->
+      <div class="sp" id="p4"></div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about" aria-labelledby="aboutHeading">
+  <div class="about-grid">
+    <div class="about-content">
+      <div class="sec-label" style="text-align:left;">Who We Are</div>
+      <div class="sec-title" id="aboutHeading" style="text-align:left;font-size:30px;">Local. Reliable.<br/>Here When You Need It.</div>
+      <p style="margin-top:14px;">LWorks is your local multi-service hub — skilled and equipped to handle your home, property, and vehicle without the runaround.</p>
+      <p>We come to you. No hauling, no waiting on multiple contractors. Sussex, Lisbon, Lake Country, and surrounding areas — if you're nearby, we've got you covered.</p>
+      <p>Stay up to date on services, seasonal specials, and availability by following us on Facebook.</p>
+      <a href="https://www.facebook.com/profile.php?id=61588819520954" class="fb-btn" target="_blank" rel="noopener" aria-label="Follow LWorks on Facebook">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Follow on Facebook
+      </a>
+      <div class="about-stats">
+        <div class="stat"><strong class="grad">10+</strong><span>Services Offered</span></div>
+        <div class="stat"><strong class="grad">3+</strong><span>Service Areas</span></div>
+        <div class="stat"><strong class="grad">100%</strong><span>We Come to You</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="about-cards">
+        <div class="ac"><div class="aci">🏠</div>We come to your home or driveway</div>
+        <div class="ac"><div class="aci">📱</div>Easy online booking in minutes</div>
+        <div class="ac"><div class="aci">💰</div>Upfront pricing, no surprises</div>
+        <div class="ac"><div class="aci">🎯</div>Bundle services and save</div>
+        <div class="ac"><div class="aci">📍</div>Sussex, Lisbon, Lake Country &amp; surrounding areas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-top">
+    <div class="fb-brand">
+      <img src="images/logo-light.png" alt="LWorks Multi Service Hub"/>
+      <p>Your local multi-service hub. Home, lawn &amp; auto handled right where you are. Serving Sussex, Lisbon, Lake Country &amp; surrounding areas, WI.</p>
+      <a href="https://www.facebook.com/profile.php?id=61588819520954" class="ffb" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Follow LWorks on Facebook
+      </a>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <a href="#services">Exterior Cleaning</a>
+      <a href="#services">Lawn Care</a>
+      <a href="#services">Auto Services</a>
+      <a href="#services">Additional Services</a>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="#estimate">Get Estimate</a>
+      <a href="#estimate">Book Appointment</a>
+      <a href="#about">About Us</a>
+      <a href="https://www.facebook.com/profile.php?id=61588819520954" target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 LWorks Multi Service Hub</p>
+    <p>Sussex · Lisbon · Lake Country &amp; Surrounding Areas, WI</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
