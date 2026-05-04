@@ -32,21 +32,22 @@ body{font-family:var(--fn);font-size:14px;color:var(--dk);background:var(--bg);l
 .nav-hamburger span{display:block;width:22px;height:2px;background:var(--dk);border-radius:2px;}
 
 /* HERO */
-.hero{background:#fff;display:grid;grid-template-columns:1fr 1fr;align-items:center;min-height:440px;position:relative;}
+.hero{background:linear-gradient(135deg,#fff 55%,#f0f4ff 100%);display:grid;grid-template-columns:1fr 1fr;align-items:center;min-height:440px;position:relative;}
 .hero-shield-bg{display:none;}
 .hero-left{padding:56px 36px 56px 32px;position:relative;z-index:2;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:#eef6ff;color:#1a6bb5;border:1px solid #bee0f7;border-radius:50px;padding:5px 14px;font-size:11px;font-weight:700;margin-bottom:18px;letter-spacing:.04em;}
 .hero-wm{font-family:var(--fd);font-size:64px;font-weight:800;line-height:.9;margin-bottom:8px;display:flex;align-items:baseline;gap:0;}
 .hero-works{font-family:var(--fd);font-size:64px;font-weight:800;line-height:.9;background:linear-gradient(90deg,#29a9e0 0%,#1ec8c8 50%,#2db54b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-left:6px;}
 .hero-tag{font-family:var(--fd);font-size:20px;font-weight:600;color:var(--mid);margin-bottom:16px;}
+.hero-wordmark-img{height:90px;width:auto;display:block;max-width:100%;margin-bottom:12px;}
 .hero-sub{font-size:14px;color:var(--mid);max-width:360px;margin-bottom:26px;line-height:1.75;}
 .hero-btns{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
 .trust{display:flex;gap:18px;flex-wrap:wrap;}
 .tc{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#3a4558;}
 .td{width:8px;height:8px;border-radius:50%;background:var(--g);flex-shrink:0;}
 .td-pu{background:linear-gradient(135deg,var(--p),var(--b)) !important;}
-.hero-right{display:flex;align-items:center;justify-content:center;padding:20px;background:transparent;}
-.hero-logo-img{width:100%;max-width:440px;object-fit:contain;filter:drop-shadow(0 12px 40px rgba(91,47,201,.28));animation:fl 4s ease-in-out infinite;background:transparent;}
+.hero-right{display:flex;align-items:center;justify-content:center;padding:20px;background:none;border:none;box-shadow:none;}
+.hero-logo-img{width:100%;max-width:440px;object-fit:contain;filter:drop-shadow(0 12px 40px rgba(91,47,201,.28));animation:fl 4s ease-in-out infinite;}
 @keyframes fl{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 
 /* SERVICES SECTION */
