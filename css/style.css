@@ -209,7 +209,7 @@ textarea:focus{outline:none;border-color:var(--b);}
 @media(max-width:768px){
   .hero{min-height:auto;padding:0;}
   .hero-left{padding:28px 20px 32px;align-items:center;text-align:center;}
-  .hero-wordmark-img{width:320px;}
+  .hero-wordmark-img{width:360px;}
   .hero-sub{text-align:center;}
   .hero-btns{justify-content:center;}
   .trust{justify-content:center;}
@@ -226,5 +226,5 @@ textarea:focus{outline:none;border-color:var(--b);}
 @media(max-width:480px){
   .cards{grid-template-columns:1fr;}
   .ecta-btns{flex-direction:column;}
-  .hero-wordmark-img{width:290px;}
+  .hero-wordmark-img{width:320px;}
 }
