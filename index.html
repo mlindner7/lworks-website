@@ -24,10 +24,6 @@
     <a href="#estimate">Get Estimate</a>
     <a href="#about">About</a>
     <a href="#estimate" class="nav-cta">Book Now</a>
-    <a href="https://www.facebook.com/profile.php?id=61588819520954" class="nav-fb" target="_blank" rel="noopener" aria-label="Facebook">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-      Facebook
-    </a>
   </div>
   <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
     <span></span><span></span><span></span>
@@ -36,11 +32,61 @@
 
 <!-- HERO -->
 <section class="hero" id="home" aria-labelledby="heroHeading">
+  <!-- Shield watermark -->
+  <div class="hero-shield-bg" aria-hidden="true">
+    <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="shG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2db54b"/>
+          <stop offset="50%" stop-color="#29a9e0"/>
+          <stop offset="100%" stop-color="#5b2fc9"/>
+        </linearGradient>
+      </defs>
+      <path d="M110 8 L195 42 L195 120 Q195 185 110 226 Q25 185 25 120 L25 42 Z" fill="url(#shG)"/>
+      <path d="M110 22 L182 52 L182 120 Q182 172 110 210 Q38 172 38 120 L38 52 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <rect x="68" y="42" width="76" height="76" rx="5" fill="none" stroke="#fff" stroke-width="3" opacity="0.9"/>
+      <line x1="106" y1="42" x2="106" y2="118" stroke="#fff" stroke-width="2" opacity="0.7"/>
+      <line x1="68" y1="80" x2="144" y2="80" stroke="#fff" stroke-width="2" opacity="0.7"/>
+      <g transform="translate(87,61)">
+        <path d="M0,-10 L2,-2 L10,0 L2,2 L0,10 L-2,2 L-10,0 L-2,-2 Z" fill="#fff" opacity="0.95"/>
+      </g>
+      <path d="M38 168 Q32 140 28 128 Q34 134 40 152 Q44 136 50 126 Q54 140 48 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M62 168 Q58 146 54 136 Q60 142 64 156 Q68 142 73 132 Q76 146 71 168Z" fill="#3dc856" opacity="0.95"/>
+      <path d="M88 168 Q84 148 81 138 Q87 144 90 158 Q94 144 99 134 Q102 148 97 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M114 168 Q110 150 108 140 Q113 146 115 158 Q119 146 124 136 Q127 150 122 168Z" fill="#3dc856" opacity="0.95"/>
+      <path d="M138 168 Q135 153 133 144 Q138 150 139 162 Q143 150 148 142 Q151 155 146 168Z" fill="#2db54b" opacity="0.9"/>
+      <path d="M30 178 Q110 160 190 172" stroke="#2db54b" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.9"/>
+      <path d="M30 178 Q110 160 190 172" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.35"/>
+    </svg>
+  </div>
+
   <div class="hero-left">
     <div class="pill">📍 Sussex · Lisbon · Lake Country &amp; Surrounding Areas, WI</div>
-    <div id="heroHeading" style="margin-bottom:16px;">
-      <img src="images/wordmark.png" alt="LWorks Multi Service Hub" style="height:90px;width:auto;display:block;max-width:100%;"/>
+
+    <!-- L wordmark — geometric SVG, purple→blue gradient, 4-point star -->
+    <div class="hero-wm" id="heroHeading">
+      <span>
+        <svg width="52" height="66" viewBox="0 0 52 66" style="display:block;margin-bottom:-2px;" aria-hidden="true">
+          <defs>
+            <linearGradient id="heroLgrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#5b2fc9"/>
+              <stop offset="100%" stop-color="#29a9e0"/>
+            </linearGradient>
+          </defs>
+          <!-- Geometric L: thick vertical bar + horizontal foot -->
+          <rect x="4" y="4" width="14" height="52" rx="2" fill="url(#heroLgrad)"/>
+          <rect x="4" y="46" width="36" height="10" rx="2" fill="url(#heroLgrad)"/>
+          <!-- 4-pointed cross star, upper right -->
+          <g transform="translate(34,14)">
+            <path d="M0,-11 L2.2,-2.2 L11,0 L2.2,2.2 L0,11 L-2.2,2.2 L-11,0 L-2.2,-2.2 Z" fill="#c8e8ff" opacity="0.85"/>
+            <path d="M0,-8 L1.6,-1.6 L8,0 L1.6,1.6 L0,8 L-1.6,1.6 L-8,0 L-1.6,-1.6 Z" fill="#ffffff"/>
+          </g>
+        </svg>
+      </span>
+      <span class="hero-works">WORKS</span>
     </div>
+
+    <div class="hero-tag">Multi Service Hub</div>
     <p class="hero-sub">Skilled, equipped, and ready to come to you. Home, lawn, and auto care — handled right at your property, no hauling required.</p>
     <div class="hero-btns">
       <a href="#estimate" class="btn-primary">Get a Free Estimate</a>
@@ -52,7 +98,8 @@
       <div class="tc"><div class="td td-pu"></div> Bundle &amp; Save</div>
     </div>
   </div>
-  <div class="hero-right">
+
+  <div class="hero-right" aria-hidden="true">
     <img class="hero-logo-img" src="images/shield.png" alt="LWorks shield"/>
   </div>
 </section>
@@ -245,6 +292,18 @@
 
         <label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label>
         <textarea id="fnotes" placeholder="e.g. 2-story home, 3-car garage, gate code, preferred timing…"></textarea>
+
+        <div class="prop-lbl" style="margin-top:20px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional — helps us estimate better)</span></div>
+        <label class="photo-upload-label" for="fphoto" id="photoLabel">
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-text">Tap to add a photo of the area you'd like serviced</div>
+          <div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div>
+          <input type="file" id="fphoto" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)"/>
+        </label>
+        <div id="photoPreview" style="display:none;margin-top:10px;position:relative;">
+          <img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/>
+          <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
 
         <div class="fa">
           <button class="btn-back" onclick="goStep(2)">← Back</button>
