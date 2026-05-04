@@ -39,7 +39,7 @@ body{font-family:var(--fn);font-size:14px;color:var(--dk);background:var(--bg);l
 .hero-wm{font-family:var(--fd);font-size:64px;font-weight:800;line-height:.9;margin-bottom:8px;display:flex;align-items:baseline;gap:0;}
 .hero-works{font-family:var(--fd);font-size:64px;font-weight:800;line-height:.9;background:linear-gradient(90deg,#29a9e0 0%,#1ec8c8 50%,#2db54b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-left:6px;}
 .hero-tag{font-family:var(--fd);font-size:20px;font-weight:600;color:var(--mid);margin-bottom:16px;}
-.hero-wordmark-img{height:90px;width:auto;display:block;max-width:100%;margin-bottom:12px;}
+.hero-wordmark-img{height:72px;width:auto;display:block;max-width:320px;margin-bottom:12px;}
 .hero-sub{font-size:14px;color:var(--mid);max-width:360px;margin-bottom:26px;line-height:1.75;}
 .hero-btns{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
 .trust{display:flex;gap:18px;flex-wrap:wrap;}
@@ -212,11 +212,11 @@ textarea:focus{outline:none;border-color:var(--b);}
 
 /* MOBILE */
 @media(max-width:768px){
-  .hero{grid-template-columns:1fr;min-height:auto;}
-  .hero-right{display:flex;justify-content:center;padding:0 20px 32px;background:transparent;}
-  .hero-logo-img{max-width:300px;}
-  .hero-left{padding:32px 20px 16px;}
-  .hero-wm,.hero-works{font-size:52px;}
+  .hero{grid-template-columns:1fr;min-height:auto;background:linear-gradient(180deg,#fff 60%,#f0f4ff 100%);}
+  .hero-left{padding:28px 20px 12px;width:100%;}
+  .hero-right{display:flex;justify-content:center;padding:0 40px 32px;background:none;width:100%;}
+  .hero-logo-img{max-width:240px;}
+  .hero-wordmark-img{height:56px;max-width:260px;}
   .cards{grid-template-columns:1fr 1fr;}
   .about-grid{grid-template-columns:1fr;gap:32px;}
   .form-row{grid-template-columns:1fr;}
@@ -228,7 +228,7 @@ textarea:focus{outline:none;border-color:var(--b);}
 }
 @media(max-width:480px){
   .cards{grid-template-columns:1fr;}
-  .hero-wm,.hero-works{font-size:44px;}
   .ecta-btns{flex-direction:column;}
-  .hero-logo-img{max-width:260px;}
+  .hero-logo-img{max-width:200px;}
+  .hero-wordmark-img{height:48px;max-width:220px;}
 }
