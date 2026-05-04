@@ -397,3 +397,30 @@ function resetTool() {
 
   goStep(1);
 }
+
+// =============================================
+// PHOTO UPLOAD
+// =============================================
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const preview = document.getElementById('photoPreview');
+  const thumb = document.getElementById('photoThumb');
+  const label = document.getElementById('photoLabel');
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    thumb.src = e.target.result;
+    preview.style.display = 'block';
+    label.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto() {
+  document.getElementById('fphoto').value = '';
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoLabel').style.display = 'flex';
+  document.getElementById('photoThumb').src = '';
+}
