@@ -60,7 +60,8 @@ const SERVICES = {
     items: [
       { id: 'carp', name: 'Carpet Cleaning', desc: 'Rooms quoted by area', low: { sm:60, md:100, lg:160, xl:260 }, high: { sm:130, md:220, lg:360, xl:560 } },
       { id: 'haul', name: 'Local Hauling', desc: 'Junk removal, furniture, debris', low: { sm:75, md:100, lg:140, xl:200 }, high: { sm:150, md:220, lg:320, xl:500 } },
-      { id: 'seas', name: 'Seasonal & Winter', desc: 'Snow removal, seasonal prep', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } }
+      { id: 'seas', name: 'Seasonal / Winter Services', desc: 'Snow removal, seasonal prep', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } },
+      { id: 'othr', name: 'Other / Custom', desc: 'Describe what you need — we\'ll quote it', low: { sm:0, md:0, lg:0, xl:0 }, high: { sm:0, md:0, lg:0, xl:0 }, isOther: true }
     ]
   }
 };
@@ -179,7 +180,20 @@ function buildCategoryBlocks() {
         <div class="cat-toggle">▼</div>
       </div>
       <div class="cat-items" id="items-${catKey}">
-        ${cat.items.map(item => `
+        ${cat.items.map(item => item.isOther ? `
+          <div class="item-row" id="row-${item.id}" onclick="toggleItem('${catKey}','${item.id}')">
+            <div class="item-cb" id="cb-${item.id}"></div>
+            <div class="item-info" style="flex:1;">
+              <div class="item-name">${item.name}</div>
+              <div class="item-desc">${item.desc}</div>
+              <textarea id="othr-desc" placeholder="Tell us what you need — e.g. fence staining, power outlet installation, moving help…"
+                onclick="event.stopPropagation()"
+                style="display:none;margin-top:8px;width:100%;min-height:72px;background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:8px 12px;font-size:12px;font-family:var(--fn);color:var(--dk);resize:vertical;transition:border-color .15s;"
+                oninput="updateOtherDesc(this.value)"></textarea>
+            </div>
+            <div class="item-price" style="color:var(--mid);font-style:italic;font-size:11px;">quoted on-site</div>
+          </div>
+        ` : `
           <div class="item-row" id="row-${item.id}" onclick="toggleItem('${catKey}','${item.id}')">
             <div class="item-cb" id="cb-${item.id}"></div>
             <div class="item-info">
@@ -207,10 +221,18 @@ function toggleItem(catKey, itemId) {
   if (isSelected) {
     row.classList.remove('sel');
     delete selectedItems[itemId];
+    if (itemId === 'othr') {
+      const ta = document.getElementById('othr-desc');
+      if (ta) { ta.style.display = 'none'; ta.value = ''; }
+    }
   } else {
     row.classList.add('sel');
     const item = SERVICES[catKey].items.find(i => i.id === itemId);
     selectedItems[itemId] = { catKey, item };
+    if (itemId === 'othr') {
+      const ta = document.getElementById('othr-desc');
+      if (ta) { ta.style.display = 'block'; ta.focus(); }
+    }
   }
 
   // Update category count badge
@@ -238,6 +260,12 @@ function updateSelSummary() {
     summaryEl.innerHTML = total > 0
       ? `<strong>${total} service${total > 1 ? 's' : ''}</strong> selected`
       : 'Select at least one service below';
+  }
+}
+
+function updateOtherDesc(val) {
+  if (selectedItems['othr']) {
+    selectedItems['othr'].customDesc = val.trim();
   }
 }
 
@@ -273,11 +301,15 @@ function buildEstimate() {
     let totalLow = 0, totalHigh = 0;
 
     items.forEach(({ catKey, item }) => {
+      if (!catGroups[catKey]) catGroups[catKey] = [];
+      if (item.isOther) {
+        catGroups[catKey].push({ name: item.name, lo: 0, hi: 0, isOther: true });
+        return; // don't add to totals
+      }
       const lo = item.low[propSize] || item.low.md;
       const hi = item.high[propSize] || item.high.md;
       totalLow += lo;
       totalHigh += hi;
-      if (!catGroups[catKey]) catGroups[catKey] = [];
       catGroups[catKey].push({ name: item.name, lo, hi });
     });
 
@@ -301,7 +333,12 @@ function buildEstimate() {
     Object.entries(catGroups).forEach(([catKey, catItems]) => {
       breakdownRows += `<div class="ebd-cat">${SERVICES[catKey].label}</div>`;
       catItems.forEach(it => {
-        breakdownRows += `<div class="el"><span class="el-name">${it.name}</span><span class="el-range">$${it.lo} – $${it.hi}</span></div>`;
+        if (it.isOther) {
+          const desc = selectedItems['othr']?.customDesc || '';
+          breakdownRows += `<div class="el"><span class="el-name">Other / Custom${desc ? `: <em>${desc}</em>` : ''}</span><span class="el-range" style="font-style:italic;color:var(--mid)">quoted on-site</span></div>`;
+        } else {
+          breakdownRows += `<div class="el"><span class="el-name">${it.name}</span><span class="el-range">$${it.lo} – $${it.hi}</span></div>`;
+        }
       });
     });
     if (discountLow > 0) {
@@ -422,7 +459,13 @@ async function acceptEstimate() {
 
   const contactPref = getContactPref();
   const { items, totalLow, totalHigh, discountLow, discountHigh, sizeLabel, typeLabel, calendlyRoute } = estimateState;
-  const servicesText = items.map(i => i.item.name).join(', ');
+  const servicesText = items.map(i => {
+    if (i.item.id === 'othr') {
+      const desc = i.customDesc || selectedItems['othr']?.customDesc || '';
+      return desc ? `Other / Custom: ${desc}` : 'Other / Custom';
+    }
+    return i.item.name;
+  }).join(', ');
 
   try {
     await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
@@ -480,6 +523,10 @@ function resetTool() {
   propType = 'single';
   userData = {};
   estimateState = {};
+
+  // Clear Other textarea if visible
+  const othrTa = document.getElementById('othr-desc');
+  if (othrTa) { othrTa.style.display = 'none'; othrTa.value = ''; }
 
   // Clear form
   ['fname','lname','femail','fphone','faddress'].forEach(id => {
