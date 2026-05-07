@@ -29,7 +29,7 @@ const SERVICES = {
     icon: 'window',
     color: '#29a9e0',
     items: [
-      { id: 'win', name: 'Window Cleaning', desc: 'Interior & exterior glass', low: { sm:80, md:120, lg:180, xl:280 }, high: { sm:140, md:200, lg:300, xl:420 } },
+      { id: 'win', name: 'Window Cleaning', desc: 'Exterior glass, frames & sills', low: { sm:80, md:120, lg:180, xl:280 }, high: { sm:140, md:200, lg:300, xl:420 } },
       { id: 'scr', name: 'Screen Cleaning', desc: 'All screens removed, washed, reinstalled', low: { sm:40, md:60, lg:90, xl:130 }, high: { sm:70, md:100, lg:150, xl:200 } },
       { id: 'gut', name: 'Gutter Cleaning', desc: 'Clear debris, flush downspouts', low: { sm:80, md:120, lg:180, xl:260 }, high: { sm:140, md:200, lg:300, xl:400 } },
       { id: 'prs', name: 'Pressure Washing', desc: 'Driveway, siding, deck, patio', low: { sm:80, md:140, lg:220, xl:340 }, high: { sm:150, md:250, lg:380, xl:580 } }
@@ -49,9 +49,9 @@ const SERVICES = {
     label: 'Auto Services',
     icon: '🔧',
     items: [
-      { id: 'oil', name: 'Oil Change', desc: 'Conventional or synthetic, in your driveway', low: { sm:60, md:60, lg:60, xl:60 }, high: { sm:110, md:110, lg:110, xl:110 } },
-      { id: 'brk', name: 'Disc Brake Service', desc: 'Pads & rotors, parts quoted separately', low: { sm:120, md:120, lg:120, xl:120 }, high: { sm:280, md:280, lg:280, xl:280 } },
-      { id: 'det', name: 'Interior Detailing', desc: 'Vacuum, wipe-down, windows, mats', low: { sm:80, md:100, lg:100, xl:100 }, high: { sm:180, md:200, lg:200, xl:200 } }
+      { id: 'oil', name: 'Oil Change', desc: 'Done in your driveway · parts (oil, filter, gasket) picked up & billed separately — not included in estimate', low: { sm:60, md:60, lg:60, xl:60 }, high: { sm:110, md:110, lg:110, xl:110 } },
+      { id: 'brk', name: 'Disc Brake Service', desc: 'Done in your driveway · parts (pads & rotors) picked up & billed separately — not included in estimate', low: { sm:120, md:120, lg:120, xl:120 }, high: { sm:280, md:280, lg:280, xl:280 } },
+      { id: 'det', name: 'Light Interior Detailing', desc: 'Vacuum, wipe-down, interior windows & mats', low: { sm:80, md:100, lg:100, xl:100 }, high: { sm:180, md:200, lg:200, xl:200 } }
     ]
   },
   additional: {
@@ -60,8 +60,7 @@ const SERVICES = {
     items: [
       { id: 'carp', name: 'Carpet Cleaning', desc: 'Rooms quoted by area', low: { sm:60, md:100, lg:160, xl:260 }, high: { sm:130, md:220, lg:360, xl:560 } },
       { id: 'haul', name: 'Local Hauling', desc: 'Junk removal, furniture, debris', low: { sm:75, md:100, lg:140, xl:200 }, high: { sm:150, md:220, lg:320, xl:500 } },
-      { id: 'seas', name: 'Seasonal / Winter Services', desc: 'Snow removal, seasonal prep', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } },
-      { id: 'othr', name: 'Other / Custom', desc: 'Describe what you need — we\'ll quote it', low: { sm:0, md:0, lg:0, xl:0 }, high: { sm:0, md:0, lg:0, xl:0 }, isOther: true }
+      { id: 'seas', name: 'Seasonal / Winter Services', desc: 'Snow removal, seasonal prep & cleanup', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } }
     ]
   }
 };
@@ -73,7 +72,6 @@ let selectedItems = {}; // { itemId: { catKey, item } }
 let propSize = 'md';
 let propType = 'single';
 let userData = {};
-let estimateState = {}; // stored at build time for acceptEstimate()
 
 // =============================================
 // NAV
@@ -180,20 +178,7 @@ function buildCategoryBlocks() {
         <div class="cat-toggle">▼</div>
       </div>
       <div class="cat-items" id="items-${catKey}">
-        ${cat.items.map(item => item.isOther ? `
-          <div class="item-row" id="row-${item.id}" onclick="toggleItem('${catKey}','${item.id}')">
-            <div class="item-cb" id="cb-${item.id}"></div>
-            <div class="item-info" style="flex:1;">
-              <div class="item-name">${item.name}</div>
-              <div class="item-desc">${item.desc}</div>
-              <textarea id="othr-desc" placeholder="Tell us what you need — e.g. fence staining, power outlet installation, moving help…"
-                onclick="event.stopPropagation()"
-                style="display:none;margin-top:8px;width:100%;min-height:72px;background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:8px 12px;font-size:12px;font-family:var(--fn);color:var(--dk);resize:vertical;transition:border-color .15s;"
-                oninput="updateOtherDesc(this.value)"></textarea>
-            </div>
-            <div class="item-price" style="color:var(--mid);font-style:italic;font-size:11px;">quoted on-site</div>
-          </div>
-        ` : `
+        ${cat.items.map(item => `
           <div class="item-row" id="row-${item.id}" onclick="toggleItem('${catKey}','${item.id}')">
             <div class="item-cb" id="cb-${item.id}"></div>
             <div class="item-info">
@@ -221,18 +206,10 @@ function toggleItem(catKey, itemId) {
   if (isSelected) {
     row.classList.remove('sel');
     delete selectedItems[itemId];
-    if (itemId === 'othr') {
-      const ta = document.getElementById('othr-desc');
-      if (ta) { ta.style.display = 'none'; ta.value = ''; }
-    }
   } else {
     row.classList.add('sel');
     const item = SERVICES[catKey].items.find(i => i.id === itemId);
     selectedItems[itemId] = { catKey, item };
-    if (itemId === 'othr') {
-      const ta = document.getElementById('othr-desc');
-      if (ta) { ta.style.display = 'block'; ta.focus(); }
-    }
   }
 
   // Update category count badge
@@ -245,6 +222,7 @@ function toggleItem(catKey, itemId) {
   }
 
   // Bundle note
+  const totalSelected = Object.keys(selectedItems).length;
   const catCount = new Set(Object.values(selectedItems).map(v => v.catKey)).size;
   const bn = document.getElementById('bn');
   if (bn) bn.style.display = catCount >= 2 ? 'flex' : 'none';
@@ -260,12 +238,6 @@ function updateSelSummary() {
     summaryEl.innerHTML = total > 0
       ? `<strong>${total} service${total > 1 ? 's' : ''}</strong> selected`
       : 'Select at least one service below';
-  }
-}
-
-function updateOtherDesc(val) {
-  if (selectedItems['othr']) {
-    selectedItems['othr'].customDesc = val.trim();
   }
 }
 
@@ -288,7 +260,7 @@ function selProp(el, group) {
 }
 
 // =============================================
-// STEP 4 — Build estimate (no EmailJS here)
+// STEP 4 — Build estimate
 // =============================================
 function buildEstimate() {
   const p4 = document.getElementById('p4');
@@ -299,18 +271,16 @@ function buildEstimate() {
     const items = Object.values(selectedItems);
     const catGroups = {};
     let totalLow = 0, totalHigh = 0;
+    const lineItems = [];
 
     items.forEach(({ catKey, item }) => {
-      if (!catGroups[catKey]) catGroups[catKey] = [];
-      if (item.isOther) {
-        catGroups[catKey].push({ name: item.name, lo: 0, hi: 0, isOther: true });
-        return; // don't add to totals
-      }
       const lo = item.low[propSize] || item.low.md;
       const hi = item.high[propSize] || item.high.md;
       totalLow += lo;
       totalHigh += hi;
+      if (!catGroups[catKey]) catGroups[catKey] = [];
       catGroups[catKey].push({ name: item.name, lo, hi });
+      lineItems.push({ catKey, name: item.name, lo, hi });
     });
 
     // Bundle discount
@@ -325,20 +295,16 @@ function buildEstimate() {
       totalHigh -= discountHigh;
     }
 
+    // Size label
     const sizeLabels = { sm: 'Small lot (under ¼ acre)', md: 'Medium lot (¼–½ acre)', lg: 'Large lot (½–1 acre)', xl: 'Extra large (1+ acre)' };
     const typeLabels = { single: 'Single Family', multi: 'Multi-Family', condo: 'Condo/Townhome', commercial: 'Commercial' };
 
-    // Build breakdown rows
+    // Build breakdown HTML
     let breakdownRows = '';
     Object.entries(catGroups).forEach(([catKey, catItems]) => {
       breakdownRows += `<div class="ebd-cat">${SERVICES[catKey].label}</div>`;
       catItems.forEach(it => {
-        if (it.isOther) {
-          const desc = selectedItems['othr']?.customDesc || '';
-          breakdownRows += `<div class="el"><span class="el-name">Other / Custom${desc ? `: <em>${desc}</em>` : ''}</span><span class="el-range" style="font-style:italic;color:var(--mid)">quoted on-site</span></div>`;
-        } else {
-          breakdownRows += `<div class="el"><span class="el-name">${it.name}</span><span class="el-range">$${it.lo} – $${it.hi}</span></div>`;
-        }
+        breakdownRows += `<div class="el"><span class="el-name">${it.name}</span><span class="el-range">$${it.lo} – $${it.hi}</span></div>`;
       });
     });
     if (discountLow > 0) {
@@ -346,24 +312,30 @@ function buildEstimate() {
     }
     breakdownRows += `<div class="el el-total"><span class="el-name">Estimated Total</span><span class="el-range">$${totalLow} – $${totalHigh}</span></div>`;
 
-    // Calendly routing — stored for use by acceptEstimate()
+    // Calendly routing
     const cats = Object.keys(catGroups);
     let calendlyRoute = CONFIG.calendly.base;
     if (cats.length > 1) calendlyRoute += CONFIG.calendly.routes.multi;
     else calendlyRoute += CONFIG.calendly.routes[cats[0]] || CONFIG.calendly.routes.multi;
 
-    // Save state so acceptEstimate() has everything it needs
-    estimateState = {
-      items,
-      catGroups,
-      totalLow,
-      totalHigh,
-      discountLow,
-      discountHigh,
-      sizeLabel: sizeLabels[propSize],
-      typeLabel: typeLabels[propType],
-      calendlyRoute
-    };
+    // EmailJS
+    const servicesText = items.map(i => i.item.name).join(', ');
+    try {
+      emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
+        from_name: `${userData.firstName} ${userData.lastName}`,
+        from_email: userData.email,
+        phone: userData.phone || 'Not provided',
+        address: userData.address,
+        services: servicesText,
+        property_size: sizeLabels[propSize],
+        property_type: typeLabels[propType],
+        estimate_low: totalLow,
+        estimate_high: totalHigh,
+        bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None'
+      });
+    } catch (e) {
+      console.error('EmailJS error:', e);
+    }
 
     p4.innerHTML = `
       <div class="result">
@@ -378,140 +350,19 @@ function buildEstimate() {
           ${breakdownRows}
         </div>
 
-        <p class="en">This is a ballpark range — your final price may vary based on property condition and exact scope. We'll confirm everything before any work begins. <strong>No deposit required to book.</strong></p>
+        <p class="en">This is a ballpark range — your final price may vary based on property condition and exact scope. We'll confirm everything before any work begins. <strong>No deposit required to book.</strong> Estimate sent to ${userData.email}.</p>
 
-        <!-- CONTACT PREFERENCE -->
-        <div style="background:#f8f9fc;border:1px solid var(--br);border-radius:12px;padding:18px 20px;margin:18px 0;text-align:left;">
-          <p style="font-size:13px;font-weight:700;color:var(--dk);margin-bottom:12px;">How should we follow up with you?</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;" id="contactPrefGroup">
-            <button type="button" class="contact-pref-btn" data-val="text" onclick="selContactPref(this)"
-              style="flex:1;min-width:90px;background:#fff;border:2px solid var(--br);border-radius:8px;padding:10px 12px;font-size:12px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;">
-              📱 Text
-            </button>
-            <button type="button" class="contact-pref-btn" data-val="call" onclick="selContactPref(this)"
-              style="flex:1;min-width:90px;background:#fff;border:2px solid var(--br);border-radius:8px;padding:10px 12px;font-size:12px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;">
-              📞 Call
-            </button>
-            <button type="button" class="contact-pref-btn" data-val="email" onclick="selContactPref(this)"
-              style="flex:1;min-width:90px;background:#fff;border:2px solid var(--br);border-radius:8px;padding:10px 12px;font-size:12px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;">
-              ✉️ Email
-            </button>
+        <div class="ecta">
+          <h3>Ready to pick your date?</h3>
+          <p>Choose a time that works for you — we'll review details and give you a firm quote before anything starts.</p>
+          <div class="ecta-btns">
+            <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-white">📅 Book My Appointment</a>
           </div>
-        </div>
-
-        <!-- ACCEPT + BOOK BUTTONS -->
-        <div style="background:linear-gradient(135deg,rgba(91,47,201,.06),rgba(41,169,224,.06));border:1px solid rgba(91,47,201,.15);border-radius:14px;padding:22px 20px;margin-bottom:14px;text-align:left;">
-          <h3 style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--dk);margin-bottom:6px;">Ready to lock it in?</h3>
-          <p style="font-size:13px;color:var(--mid);margin-bottom:18px;">Accept your estimate to confirm you're interested — then pick a date that works for you.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-
-            <button type="button" id="acceptBtn" onclick="acceptEstimate()"
-              style="flex:1;min-width:140px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#2db54b,#1a9e3a);color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;padding:13px 20px;border-radius:50px;border:none;cursor:pointer;letter-spacing:.04em;transition:transform .15s,box-shadow .15s;">
-              ✅ Accept Estimate
-            </button>
-
-            <a id="bookBtn" href="#"
-              style="flex:1;min-width:140px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#c8d0de;color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;padding:13px 20px;border-radius:50px;border:none;letter-spacing:.04em;pointer-events:none;text-decoration:none;cursor:not-allowed;transition:all .3s;">
-              📅 Book My Appointment
-            </a>
-
-          </div>
-          <p id="acceptHint" style="font-size:11px;color:var(--lt);margin-top:10px;">👆 Accept your estimate first to unlock booking.</p>
         </div>
 
         <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;margin-top:4px;">← Start Over</button>
       </div>`;
   }, 1800);
-}
-
-// =============================================
-// CONTACT PREFERENCE SELECTOR
-// =============================================
-function selContactPref(btn) {
-  document.querySelectorAll('.contact-pref-btn').forEach(b => {
-    b.style.borderColor = 'var(--br)';
-    b.style.color = 'var(--mid)';
-    b.style.background = '#fff';
-  });
-  btn.style.borderColor = 'var(--p)';
-  btn.style.color = 'var(--p)';
-  btn.style.background = 'rgba(91,47,201,.07)';
-}
-
-function getContactPref() {
-  const sel = document.querySelector('.contact-pref-btn[style*="var(--p)"]');
-  return sel ? sel.dataset.val : 'not specified';
-}
-
-// =============================================
-// ACCEPT ESTIMATE — fires EmailJS, unlocks Book
-// =============================================
-async function acceptEstimate() {
-  const acceptBtn = document.getElementById('acceptBtn');
-  const bookBtn = document.getElementById('bookBtn');
-  const hint = document.getElementById('acceptHint');
-
-  if (!acceptBtn || acceptBtn.disabled) return;
-
-  // Disable button while sending
-  acceptBtn.disabled = true;
-  acceptBtn.textContent = 'Sending…';
-
-  const contactPref = getContactPref();
-  const { items, totalLow, totalHigh, discountLow, discountHigh, sizeLabel, typeLabel, calendlyRoute } = estimateState;
-  const servicesText = items.map(i => {
-    if (i.item.id === 'othr') {
-      const desc = i.customDesc || selectedItems['othr']?.customDesc || '';
-      return desc ? `Other / Custom: ${desc}` : 'Other / Custom';
-    }
-    return i.item.name;
-  }).join(', ');
-
-  try {
-    await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
-      from_name: `${userData.firstName} ${userData.lastName}`,
-      from_email: userData.email,
-      phone: userData.phone || 'Not provided',
-      address: userData.address,
-      services: servicesText,
-      property_size: sizeLabel,
-      property_type: typeLabel,
-      estimate_low: totalLow,
-      estimate_high: totalHigh,
-      bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None',
-      contact_preference: contactPref
-    });
-
-    // Success state — green confirmed button
-    acceptBtn.style.background = 'linear-gradient(135deg,#2db54b,#1a9e3a)';
-    acceptBtn.innerHTML = '✅ Estimate Accepted!';
-    acceptBtn.style.cursor = 'default';
-
-    // Unlock Book button
-    bookBtn.href = calendlyRoute;
-    bookBtn.target = '_blank';
-    bookBtn.rel = 'noopener';
-    bookBtn.style.background = 'linear-gradient(135deg,#5b2fc9,#29a9e0)';
-    bookBtn.style.pointerEvents = 'auto';
-    bookBtn.style.cursor = 'pointer';
-    bookBtn.style.animation = 'pop .4s cubic-bezier(.34,1.56,.64,1)';
-
-    // Update hint
-    if (hint) {
-      hint.innerHTML = '🎉 Estimate accepted! Now pick a date — no deposit needed.';
-      hint.style.color = '#2db54b';
-      hint.style.fontWeight = '700';
-    }
-
-  } catch (e) {
-    console.error('EmailJS error:', e);
-    acceptBtn.disabled = false;
-    acceptBtn.innerHTML = '✅ Accept Estimate';
-    if (hint) {
-      hint.innerHTML = '⚠️ Something went wrong — please try again.';
-      hint.style.color = '#e53e3e';
-    }
-  }
 }
 
 // =============================================
@@ -522,11 +373,6 @@ function resetTool() {
   propSize = 'md';
   propType = 'single';
   userData = {};
-  estimateState = {};
-
-  // Clear Other textarea if visible
-  const othrTa = document.getElementById('othr-desc');
-  if (othrTa) { othrTa.style.display = 'none'; othrTa.value = ''; }
 
   // Clear form
   ['fname','lname','femail','fphone','faddress'].forEach(id => {
