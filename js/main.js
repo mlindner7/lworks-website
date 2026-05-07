@@ -49,8 +49,8 @@ const SERVICES = {
     label: 'Auto Services',
     icon: '🔧',
     items: [
-      { id: 'oil', name: 'Oil Change', desc: 'Done in your driveway · parts (oil, filter, gasket) picked up & billed separately — not included in estimate', low: { sm:60, md:60, lg:60, xl:60 }, high: { sm:110, md:110, lg:110, xl:110 } },
-      { id: 'brk', name: 'Disc Brake Service', desc: 'Done in your driveway · parts (pads & rotors) picked up & billed separately — not included in estimate', low: { sm:120, md:120, lg:120, xl:120 }, high: { sm:280, md:280, lg:280, xl:280 } },
+      { id: 'oil', name: 'Oil Change', desc: 'Done in your driveway · parts cost billed separately — not included in estimate', low: { sm:60, md:60, lg:60, xl:60 }, high: { sm:110, md:110, lg:110, xl:110 } },
+      { id: 'brk', name: 'Disc Brake Service', desc: 'Done in your driveway · parts cost billed separately — not included in estimate', low: { sm:120, md:120, lg:120, xl:120 }, high: { sm:280, md:280, lg:280, xl:280 } },
       { id: 'det', name: 'Light Interior Detailing', desc: 'Vacuum, wipe-down, interior windows & mats', low: { sm:80, md:100, lg:100, xl:100 }, high: { sm:180, md:200, lg:200, xl:200 } }
     ]
   },
