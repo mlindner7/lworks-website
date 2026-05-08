@@ -58,9 +58,10 @@ const SERVICES = {
     label: 'Additional Services',
     icon: '⚡',
     items: [
-      { id: 'carp', name: 'Carpet Cleaning', desc: 'Rooms quoted by area', low: { sm:60, md:100, lg:160, xl:260 }, high: { sm:130, md:220, lg:360, xl:560 } },
+      { id: 'carp', name: 'Carpet Cleaning', desc: 'Interior rooms, quoted by sq ft', low: { sm:60, md:100, lg:160, xl:260 }, high: { sm:130, md:220, lg:360, xl:560 } },
       { id: 'haul', name: 'Local Hauling', desc: 'Junk removal, furniture, debris', low: { sm:75, md:100, lg:140, xl:200 }, high: { sm:150, md:220, lg:320, xl:500 } },
-      { id: 'seas', name: 'Seasonal / Winter Services', desc: 'Snow removal, seasonal prep & cleanup', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } }
+      { id: 'seas', name: 'Seasonal / Winter Services', desc: 'Snow removal, seasonal prep & cleanup', low: { sm:60, md:80, lg:120, xl:180 }, high: { sm:130, md:180, lg:280, xl:420 } },
+      { id: 'other', name: 'Other / Custom Request', desc: 'Describe what you need — we\'ll include it in your estimate', low: { sm:50, md:50, lg:50, xl:50 }, high: { sm:50, md:50, lg:50, xl:50 }, custom: true }
     ]
   }
 };
@@ -141,7 +142,8 @@ function nextStep1() {
     lastName: lname,
     email: email,
     phone: document.getElementById('fphone').value.trim(),
-    address: address
+    address: address,
+    contactPref: document.getElementById('fcontactpref') ? document.getElementById('fcontactpref').value : 'No preference'
   };
   goStep(2);
 }
@@ -184,8 +186,9 @@ function buildCategoryBlocks() {
             <div class="item-info">
               <div class="item-name">${item.name}</div>
               <div class="item-desc">${item.desc}</div>
+              ${item.custom ? `<textarea id="custom-desc" onclick="event.stopPropagation()" placeholder="Briefly describe what you need…" style="margin-top:8px;width:100%;background:#f8f9fc;border:1.5px solid #d1d9e6;border-radius:8px;padding:8px 10px;font-size:12px;font-family:var(--fn);resize:vertical;min-height:52px;" rows="2"></textarea>` : ''}
             </div>
-            <div class="item-price">from $${item.low.md}</div>
+            <div class="item-price">${item.custom ? 'Custom' : 'from $' + item.low.md}</div>
           </div>
         `).join('')}
       </div>`;
@@ -300,6 +303,7 @@ function buildEstimate() {
     const typeLabels = { single: 'Single Family', multi: 'Multi-Family', condo: 'Condo/Townhome', commercial: 'Commercial' };
 
     // Build breakdown HTML
+    const servicesText = items.map(i => i.item.name).join(', ');
     let breakdownRows = '';
     Object.entries(catGroups).forEach(([catKey, catItems]) => {
       breakdownRows += `<div class="ebd-cat">${SERVICES[catKey].label}</div>`;
@@ -318,24 +322,9 @@ function buildEstimate() {
     if (cats.length > 1) calendlyRoute += CONFIG.calendly.routes.multi;
     else calendlyRoute += CONFIG.calendly.routes[cats[0]] || CONFIG.calendly.routes.multi;
 
-    // EmailJS
-    const servicesText = items.map(i => i.item.name).join(', ');
-    try {
-      emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
-        from_name: `${userData.firstName} ${userData.lastName}`,
-        from_email: userData.email,
-        phone: userData.phone || 'Not provided',
-        address: userData.address,
-        services: servicesText,
-        property_size: sizeLabels[propSize],
-        property_type: typeLabels[propType],
-        estimate_low: totalLow,
-        estimate_high: totalHigh,
-        bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None'
-      });
-    } catch (e) {
-      console.error('EmailJS error:', e);
-    }
+    // Custom request text
+    const customDesc = document.getElementById('custom-desc');
+    const customText = customDesc ? customDesc.value.trim() : '';
 
     p4.innerHTML = `
       <div class="result">
@@ -350,19 +339,59 @@ function buildEstimate() {
           ${breakdownRows}
         </div>
 
-        <p class="en">This is a ballpark range — your final price may vary based on property condition and exact scope. We'll confirm everything before any work begins. <strong>No deposit required to book.</strong> Estimate sent to ${userData.email}.</p>
+        <p class="en">This is a ballpark range — your final price may vary based on property condition and exact scope. We'll confirm everything before any work begins. <strong>No deposit required to book.</strong></p>
 
         <div class="ecta">
           <h3>Ready to pick your date?</h3>
-          <p>Choose a time that works for you — we'll review details and give you a firm quote before anything starts.</p>
+          <p>Tap below to accept this estimate and unlock your booking link.</p>
           <div class="ecta-btns">
-            <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-white">📅 Book My Appointment</a>
+            <button class="btn-white" id="acceptBtn" onclick="acceptEstimate('${calendlyRoute}', '${servicesText.replace(/'/g,"\\'")}', ${totalLow}, ${totalHigh}, ${discountLow}, ${discountHigh})">✅ Accept Estimate & Book</button>
           </div>
+        </div>
+
+        <div id="bookingUnlocked" style="display:none;background:rgba(45,181,75,.1);border:1px solid rgba(45,181,75,.3);border-radius:12px;padding:18px;margin-top:12px;text-align:center;">
+          <p style="font-size:13px;font-weight:700;color:#2db54b;margin-bottom:12px;">✅ Estimate accepted — choose your date below!</p>
+          <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-primary">📅 Book My Appointment</a>
         </div>
 
         <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;margin-top:4px;">← Start Over</button>
       </div>`;
   }, 1800);
+}
+
+// =============================================
+// ACCEPT ESTIMATE — fires EmailJS, unlocks booking
+// =============================================
+function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh) {
+  const btn = document.getElementById('acceptBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  const sizeLabels = { sm: 'Small lot (under ¼ acre)', md: 'Medium lot (¼–½ acre)', lg: 'Large lot (½–1 acre)', xl: 'Extra large (1+ acre)' };
+  const typeLabels = { single: 'Single Family', multi: 'Multi-Family', condo: 'Condo/Townhome', commercial: 'Commercial' };
+  const customDesc = document.getElementById('custom-desc');
+  const customText = customDesc ? customDesc.value.trim() : '';
+
+  try {
+    emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
+      from_name: `${userData.firstName} ${userData.lastName}`,
+      from_email: userData.email,
+      phone: userData.phone || 'Not provided',
+      address: userData.address,
+      services: servicesText + (customText ? ` | Custom: ${customText}` : ''),
+      property_size: sizeLabels[propSize],
+      property_type: typeLabels[propType],
+      estimate_low: totalLow,
+      estimate_high: totalHigh,
+      bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None',
+      contact_preference: userData.contactPref || 'No preference'
+    });
+  } catch (e) {
+    console.error('EmailJS error:', e);
+  }
+
+  if (btn) btn.closest('.ecta').style.display = 'none';
+  const unlocked = document.getElementById('bookingUnlocked');
+  if (unlocked) unlocked.style.display = 'block';
 }
 
 // =============================================
