@@ -142,8 +142,7 @@ function nextStep1() {
     lastName: lname,
     email: email,
     phone: document.getElementById('fphone').value.trim(),
-    address: address,
-    contactPref: document.getElementById('fcontactpref') ? document.getElementById('fcontactpref').value : 'No preference'
+    address: address
   };
   goStep(2);
 }
