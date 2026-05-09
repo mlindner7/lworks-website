@@ -343,7 +343,13 @@ function buildEstimate() {
 
         <div class="ecta">
           <h3>Ready to pick your date?</h3>
-          <p>Tap below to accept this estimate and unlock your booking link.</p>
+          <p>How would you like us to reach you to confirm?</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">
+            <button type="button" class="contact-chip" data-val="No preference" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">No preference</button>
+            <button type="button" class="contact-chip" data-val="Email" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">📧 Email</button>
+            <button type="button" class="contact-chip" data-val="Phone / Text" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">📱 Phone / Text</button>
+            <button type="button" class="contact-chip" data-val="Facebook Messenger" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">💬 Messenger</button>
+          </div>
           <div class="ecta-btns">
             <button class="btn-white" id="acceptBtn" onclick="acceptEstimate('${calendlyRoute}', '${servicesText.replace(/'/g,"\\'")}', ${totalLow}, ${totalHigh}, ${discountLow}, ${discountHigh})">✅ Accept Estimate & Book</button>
           </div>
@@ -362,6 +368,19 @@ function buildEstimate() {
 // =============================================
 // ACCEPT ESTIMATE — fires EmailJS, unlocks booking
 // =============================================
+function selContactChip(el) {
+  document.querySelectorAll('.contact-chip').forEach(c => {
+    c.style.background = 'rgba(255,255,255,.15)';
+    c.style.borderColor = 'rgba(255,255,255,.35)';
+    c.style.color = '#fff';
+    c.removeAttribute('data-selected');
+  });
+  el.style.background = '#fff';
+  el.style.borderColor = '#fff';
+  el.style.color = '#5b2fc9';
+  el.setAttribute('data-selected', 'true');
+}
+
 function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh) {
   const btn = document.getElementById('acceptBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
@@ -383,7 +402,7 @@ function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discou
       estimate_low: totalLow,
       estimate_high: totalHigh,
       bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None',
-      contact_preference: userData.contactPref || 'No preference'
+      contact_preference: (document.querySelector('.contact-chip[data-selected]') || {}).dataset?.val || userData.contactPref || 'No preference'
     });
   } catch (e) {
     console.error('EmailJS error:', e);
