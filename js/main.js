@@ -72,6 +72,12 @@ const SERVICES = {
 let selectedItems = {}; // { itemId: { catKey, item } }
 let propSize = 'md';
 let propType = 'single';
+let propStories = '1';
+let carpetRooms = '2';
+let haulLoad = 'partial';
+let autoInfo = { year: '', make: '', model: '' };
+let photoFile = null;
+let photoUrl = '';
 let userData = {};
 
 // =============================================
@@ -248,26 +254,70 @@ function nextStep2() {
     alert('Please select at least one service to continue.');
     return;
   }
+  buildStep3();
   goStep(3);
 }
 
 // =============================================
-// STEP 3 — Property options
+// STEP 3 — Dynamic property questions
 // =============================================
+function buildStep3() {
+  const cats = new Set(Object.values(selectedItems).map(v => v.catKey));
+  const needsPropertyStrict = cats.has('exterior') || cats.has('lawn') || Object.values(selectedItems).some(v => v.item.id === 'seas');
+  const needsAuto = cats.has('auto');
+  const needsCarpet = Object.values(selectedItems).some(v => v.item.id === 'carp');
+  const needsHaul = Object.values(selectedItems).some(v => v.item.id === 'haul');
+
+  const p3 = document.getElementById('p3');
+  let html = '<div class="ft">Tell us a bit more</div><div class="fh">We\'ll use this to give you the most accurate estimate possible.</div>';
+
+  if (needsPropertyStrict) {
+    html += '<div class="prop-lbl">Property / Lot Size</div><div class="po" id="po-size"><div class="popt" onclick="selProp(this,\'size\')" data-val="sm">Small<br><span style="font-size:10px;font-weight:400">Under ¼ acre</span></div><div class="popt sel" onclick="selProp(this,\'size\')" data-val="md">Medium<br><span style="font-size:10px;font-weight:400">¼–½ acre</span></div><div class="popt" onclick="selProp(this,\'size\')" data-val="lg">Large<br><span style="font-size:10px;font-weight:400">½–1 acre</span></div><div class="popt" onclick="selProp(this,\'size\')" data-val="xl">Extra Large<br><span style="font-size:10px;font-weight:400">1+ acre</span></div></div>';
+    html += '<div class="prop-lbl">Home Type</div><div class="po" id="po-type"><div class="popt sel" onclick="selProp(this,\'type\')" data-val="single">Single Family</div><div class="popt" onclick="selProp(this,\'type\')" data-val="multi">Multi-Family</div><div class="popt" onclick="selProp(this,\'type\')" data-val="condo">Condo / Townhome</div><div class="popt" onclick="selProp(this,\'type\')" data-val="commercial">Commercial</div></div>';
+    if (cats.has('exterior')) {
+      html += '<div class="prop-lbl">Number of Stories</div><div class="po" id="po-stories"><div class="popt sel" onclick="selProp(this,\'stories\')" data-val="1">1 Story</div><div class="popt" onclick="selProp(this,\'stories\')" data-val="2">2 Stories</div><div class="popt" onclick="selProp(this,\'stories\')" data-val="3">3+ Stories</div></div>';
+    }
+  }
+
+  if (needsAuto) {
+    html += '<div class="prop-lbl">Vehicle Info</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;"><div class="form-group"><label style="font-size:12px;font-weight:700;color:#2d3748;">Year</label><input type="text" id="auto-year" placeholder="2018" maxlength="4" style="background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:10px 14px;color:#1a2235;font-size:13px;font-family:inherit;width:100%;" oninput="autoInfo.year=this.value"/></div><div class="form-group"><label style="font-size:12px;font-weight:700;color:#2d3748;">Make</label><input type="text" id="auto-make" placeholder="Toyota" style="background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:10px 14px;color:#1a2235;font-size:13px;font-family:inherit;width:100%;" oninput="autoInfo.make=this.value"/></div><div class="form-group"><label style="font-size:12px;font-weight:700;color:#2d3748;">Model</label><input type="text" id="auto-model" placeholder="Camry" style="background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:10px 14px;color:#1a2235;font-size:13px;font-family:inherit;width:100%;" oninput="autoInfo.model=this.value"/></div></div>';
+  }
+
+  if (needsCarpet) {
+    html += '<div class="prop-lbl">Number of Rooms (Carpet Cleaning)</div><div class="po" id="po-rooms"><div class="popt" onclick="selProp(this,\'rooms\')" data-val="1">1 Room</div><div class="popt sel" onclick="selProp(this,\'rooms\')" data-val="2">2 Rooms</div><div class="popt" onclick="selProp(this,\'rooms\')" data-val="3">3 Rooms</div><div class="popt" onclick="selProp(this,\'rooms\')" data-val="4">4+ Rooms</div></div>';
+  }
+
+  if (needsHaul) {
+    html += '<div class="prop-lbl">Approximate Load Size (Hauling)</div><div class="po" id="po-haul"><div class="popt" onclick="selProp(this,\'haul\')" data-val="single">Single Item<br><span style="font-size:10px;font-weight:400">1–2 pieces</span></div><div class="popt sel" onclick="selProp(this,\'haul\')" data-val="partial">Partial Load<br><span style="font-size:10px;font-weight:400">Few items</span></div><div class="popt" onclick="selProp(this,\'haul\')" data-val="full">Full Load<br><span style="font-size:10px;font-weight:400">Van full</span></div></div>';
+  }
+
+  html += '<label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label><textarea id="fnotes" placeholder="e.g. gate code, preferred timing, access notes…"></textarea><div class="prop-lbl" style="margin-top:20px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional)</span></div><label class="photo-upload-label" for="fphoto" id="photoLabel"><div class="photo-upload-icon">📷</div><div class="photo-upload-text">Tap to add a photo of the area</div><div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div><input type="file" id="fphoto" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)"/></label><div id="photoPreview" style="display:none;margin-top:10px;position:relative;"><img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/><button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button></div><div class="fa"><button class="btn-back" onclick="goStep(2)">← Back</button><button class="btn-primary" onclick="buildEstimate()">Build My Estimate →</button></div>';
+
+  p3.innerHTML = html;
+}
+
 function selProp(el, group) {
   el.closest('.po').querySelectorAll('.popt').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
   if (group === 'size') propSize = el.dataset.val;
   if (group === 'type') propType = el.dataset.val;
+  if (group === 'stories') propStories = el.dataset.val;
+  if (group === 'rooms') carpetRooms = el.dataset.val;
+  if (group === 'haul') haulLoad = el.dataset.val;
 }
 
 // =============================================
 // STEP 4 — Build estimate
 // =============================================
-function buildEstimate() {
+async function buildEstimate() {
   const p4 = document.getElementById('p4');
   p4.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><p style="color:var(--mid);font-size:13px;font-weight:600;margin-top:8px;">Building your estimate…</p></div>`;
   goStep(4);
+
+  // Upload photo to Cloudinary if one was selected
+  if (photoFile) {
+    photoUrl = await uploadPhotoToCloudinary();
+  }
 
   setTimeout(() => {
     const items = Object.values(selectedItems);
@@ -275,9 +325,30 @@ function buildEstimate() {
     let totalLow = 0, totalHigh = 0;
     const lineItems = [];
 
+    // Size keys for carpet rooms and haul load
+    const roomSizeMap = { '1': 'sm', '2': 'md', '3': 'lg', '4': 'xl' };
+    const haulSizeMap = { 'single': 'sm', 'partial': 'md', 'full': 'xl' };
+    // Stories multiplier for exterior services
+    const storiesMult = { '1': 1, '2': 1.35, '3': 1.7 };
+
     items.forEach(({ catKey, item }) => {
-      const lo = item.low[propSize] || item.low.md;
-      const hi = item.high[propSize] || item.high.md;
+      let sizeKey = propSize;
+      // Override size key based on service type
+      if (item.id === 'carp') sizeKey = roomSizeMap[carpetRooms] || 'md';
+      if (item.id === 'haul') sizeKey = haulSizeMap[haulLoad] || 'md';
+      // Auto services ignore size — already flat
+      if (catKey === 'auto') sizeKey = 'md';
+
+      let lo = item.low[sizeKey] || item.low.md;
+      let hi = item.high[sizeKey] || item.high.md;
+
+      // Apply stories multiplier for exterior height-dependent services
+      if (['win','scr','gut'].includes(item.id)) {
+        const mult = storiesMult[propStories] || 1;
+        lo = Math.round(lo * mult);
+        hi = Math.round(hi * mult);
+      }
+
       totalLow += lo;
       totalHigh += hi;
       if (!catGroups[catKey]) catGroups[catKey] = [];
@@ -330,7 +401,7 @@ function buildEstimate() {
         <div class="chk">✓</div>
         <p style="color:var(--mid);font-size:13px;font-weight:600;margin-bottom:4px;">Your Estimate Range</p>
         <div class="er grad">$${totalLow} – $${totalHigh}</div>
-        <p style="color:var(--mid);font-size:12px;margin-top:4px;">${items.length} service${items.length > 1 ? 's' : ''} · ${typeLabels[propType]} · ${sizeLabels[propSize]}</p>
+        <p style="color:var(--mid);font-size:12px;margin-top:4px;">${items.length} service${items.length > 1 ? 's' : ''}${Object.keys(catGroups).some(c => c==='exterior'||c==='lawn') ? ' · ' + typeLabels[propType] + ' · ' + sizeLabels[propSize] : ''}</p>
         ${discountLow > 0 ? `<p style="color:#2db54b;font-size:12px;font-weight:700;margin-top:6px;">🎉 Bundle discount applied — you're saving $${discountLow}+</p>` : ''}
 
         <div class="est-breakdown">
@@ -396,12 +467,17 @@ function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discou
       phone: userData.phone || 'Not provided',
       address: userData.address,
       services: servicesText + (customText ? ` | Custom: ${customText}` : ''),
-      property_size: sizeLabels[propSize],
-      property_type: typeLabels[propType],
+      property_size: sizeLabels[propSize] || 'N/A',
+      property_type: typeLabels[propType] || 'N/A',
+      stories: propStories ? propStories + ' story' : 'N/A',
+      carpet_rooms: carpetRooms ? carpetRooms + ' rooms' : 'N/A',
+      haul_load: haulLoad || 'N/A',
+      vehicle: (autoInfo.year || autoInfo.make || autoInfo.model) ? `${autoInfo.year} ${autoInfo.make} ${autoInfo.model}`.trim() : 'N/A',
       estimate_low: totalLow,
       estimate_high: totalHigh,
       bundle_discount: discountLow > 0 ? `$${discountLow}–$${discountHigh}` : 'None',
-      contact_preference: (document.querySelector('.contact-chip[data-selected]') || {}).dataset?.val || userData.contactPref || 'No preference'
+      contact_preference: (document.querySelector('.contact-chip[data-selected]') || {}).dataset?.val || userData.contactPref || 'No preference',
+      photo_url: photoUrl ? photoUrl : 'No photo provided'
     });
   } catch (e) {
     console.error('EmailJS error:', e);
@@ -419,6 +495,12 @@ function resetTool() {
   selectedItems = {};
   propSize = 'md';
   propType = 'single';
+  propStories = '1';
+  carpetRooms = '2';
+  haulLoad = 'partial';
+  autoInfo = { year: '', make: '', model: '' };
+  photoFile = null;
+  photoUrl = '';
   userData = {};
 
   // Clear form
@@ -451,6 +533,8 @@ function resetTool() {
 function handlePhotoUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  photoFile = file;
+  photoUrl = '';
 
   const preview = document.getElementById('photoPreview');
   const thumb = document.getElementById('photoThumb');
@@ -470,4 +554,24 @@ function clearPhoto() {
   document.getElementById('photoPreview').style.display = 'none';
   document.getElementById('photoLabel').style.display = 'flex';
   document.getElementById('photoThumb').src = '';
+  photoFile = null;
+  photoUrl = '';
+}
+
+async function uploadPhotoToCloudinary() {
+  if (!photoFile) return '';
+  try {
+    const formData = new FormData();
+    formData.append('file', photoFile);
+    formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    return data.secure_url || '';
+  } catch(e) {
+    console.error('Cloudinary upload failed:', e);
+    return '';
+  }
 }
