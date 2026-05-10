@@ -222,47 +222,8 @@
         </div>
       </div>
 
-      <!-- STEP 3: Property -->
-      <div class="sp" id="p3">
-        <div class="ft">Tell us about your property</div>
-        <div class="fh">This helps us give you the most accurate estimate possible.</div>
-
-        <div class="prop-lbl">Property / Lot Size</div>
-        <div class="po">
-          <div class="popt" onclick="selProp(this,'size')" data-val="sm">Small<br><span style="font-size:10px;font-weight:400">Under ¼ acre</span></div>
-          <div class="popt sel" onclick="selProp(this,'size')" data-val="md">Medium<br><span style="font-size:10px;font-weight:400">¼–½ acre</span></div>
-          <div class="popt" onclick="selProp(this,'size')" data-val="lg">Large<br><span style="font-size:10px;font-weight:400">½–1 acre</span></div>
-          <div class="popt" onclick="selProp(this,'size')" data-val="xl">Extra Large<br><span style="font-size:10px;font-weight:400">1+ acre</span></div>
-        </div>
-
-        <div class="prop-lbl">Home Type</div>
-        <div class="po">
-          <div class="popt sel" onclick="selProp(this,'type')" data-val="single">Single Family</div>
-          <div class="popt" onclick="selProp(this,'type')" data-val="multi">Multi-Family</div>
-          <div class="popt" onclick="selProp(this,'type')" data-val="condo">Condo / Townhome</div>
-          <div class="popt" onclick="selProp(this,'type')" data-val="commercial">Commercial</div>
-        </div>
-
-        <label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label>
-        <textarea id="fnotes" placeholder="e.g. 2-story home, 3-car garage, gate code, preferred timing…"></textarea>
-
-        <div class="prop-lbl" style="margin-top:20px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional — helps us estimate better)</span></div>
-        <label class="photo-upload-label" for="fphoto" id="photoLabel">
-          <div class="photo-upload-icon">📷</div>
-          <div class="photo-upload-text">Tap to add a photo of the area you'd like serviced</div>
-          <div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div>
-          <input type="file" id="fphoto" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)"/>
-        </label>
-        <div id="photoPreview" style="display:none;margin-top:10px;position:relative;">
-          <img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/>
-          <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-        </div>
-
-        <div class="fa">
-          <button class="btn-back" onclick="goStep(2)">← Back</button>
-          <button class="btn-primary" onclick="buildEstimate()">Build My Estimate →</button>
-        </div>
-      </div>
+      <!-- STEP 3: Property — built dynamically by buildStep3() in main.js -->
+      <div class="sp" id="p3"></div>
 
       <!-- STEP 4: Estimate result (populated by JS) -->
       <div class="sp" id="p4"></div>
