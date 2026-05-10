@@ -453,7 +453,9 @@ async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, 
 
   // Upload photo now so URL is ready before email fires
   if (photoFile && !photoUrl) {
+    if (btn) btn.textContent = '📷 Uploading photo…';
     photoUrl = await uploadPhotoToCloudinary();
+    if (btn) btn.textContent = 'Sending…';
   }
 
   const sizeLabels = { sm: 'Small lot (under ¼ acre)', md: 'Medium lot (¼–½ acre)', lg: 'Large lot (½–1 acre)', xl: 'Extra large (1+ acre)' };
@@ -572,9 +574,10 @@ async function uploadPhotoToCloudinary() {
     const data = await res.json();
     console.log('Cloudinary response:', data);
     if (data.secure_url) {
+      alert('Photo uploaded: ' + data.secure_url.substring(0, 60) + '...');
       return data.secure_url;
     } else {
-      console.error('Cloudinary error:', data.error);
+      alert('Cloudinary error: ' + JSON.stringify(data.error));
       return '';
     }
   } catch(e) {
