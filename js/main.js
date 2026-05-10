@@ -528,9 +528,6 @@ async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, 
 
       const data = await res.json();
 
-      // DEBUG: show full response so we can see any error
-      alert('Cloudinary response:\n' + JSON.stringify(data, null, 2));
-
       if (data.secure_url) {
         photoUrl = data.secure_url;
       } else {
