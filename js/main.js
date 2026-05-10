@@ -452,7 +452,9 @@ async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, 
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
   // Upload photo now so URL is ready before email fires
-  if (photoFile && !photoUrl) {
+  const photoInput = document.getElementById('fphoto');
+  if (photoInput && photoInput.files && photoInput.files[0]) {
+    photoFile = photoInput.files[0];
     if (btn) btn.textContent = '📷 Uploading photo…';
     photoUrl = await uploadPhotoToCloudinary();
     if (btn) btn.textContent = 'Sending…';
