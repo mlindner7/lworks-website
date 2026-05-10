@@ -200,9 +200,20 @@
           <button class="btn-primary" onclick="nextStep1()">Next: Choose Services →</button>
         </div>
         <p style="font-size:11px;color:var(--lt);margin-top:12px;text-align:center;">🔒 Your information is kept private and will never be sold or shared with third parties.</p>
-        <p style="font-size:11px;color:var(--lt);text-align:center;margin-top:14px;">🔒 Your information is used only to prepare your estimate and coordinate your appointment. We never sell or share your data.</p>
-        <!-- Photo input lives here permanently so it's never wiped by dynamic DOM -->
-        <input type="file" id="fphoto" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)"/>
+
+        <div style="margin-top:20px;">
+          <div class="prop-lbl" style="margin-bottom:8px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional — helps us estimate better)</span></div>
+          <label class="photo-upload-label" for="fphoto" id="photoLabel">
+            <div class="photo-upload-icon">📷</div>
+            <div class="photo-upload-text">Tap to add a photo of the area you'd like serviced</div>
+            <div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div>
+            <input type="file" id="fphoto" accept="image/*" style="display:none;"/>
+          </label>
+          <div id="photoPreview" style="display:none;margin-top:10px;position:relative;">
+            <img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/>
+            <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>
+        </div>
       </div>
 
       <!-- STEP 2: Granular service selection -->
@@ -229,8 +240,6 @@
 
       <!-- STEP 4: Estimate result (populated by JS) -->
       <div class="sp" id="p4"></div>
-
-
 
     </div>
   </div>
