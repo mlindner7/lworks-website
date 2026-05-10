@@ -309,17 +309,15 @@ function selProp(el, group) {
 // =============================================
 // STEP 4 — Build estimate
 // =============================================
-async function buildEstimate() {
+function buildEstimate() {
   const p4 = document.getElementById('p4');
   p4.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><p style="color:var(--mid);font-size:13px;font-weight:600;margin-top:8px;">Building your estimate…</p></div>`;
   goStep(4);
 
-  // Upload photo to Cloudinary if one was selected
-  if (photoFile) {
-    photoUrl = await uploadPhotoToCloudinary();
-  }
-
+  // Minimum spinner delay
   setTimeout(() => {
+
+  (() => {
     const items = Object.values(selectedItems);
     const catGroups = {};
     let totalLow = 0, totalHigh = 0;
@@ -451,9 +449,14 @@ function selContactChip(el) {
   el.setAttribute('data-selected', 'true');
 }
 
-function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh) {
+async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh) {
   const btn = document.getElementById('acceptBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  // Upload photo now so URL is ready before email fires
+  if (photoFile && !photoUrl) {
+    photoUrl = await uploadPhotoToCloudinary();
+  }
 
   const sizeLabels = { sm: 'Small lot (under ¼ acre)', md: 'Medium lot (¼–½ acre)', lg: 'Large lot (½–1 acre)', xl: 'Extra large (1+ acre)' };
   const typeLabels = { single: 'Single Family', multi: 'Multi-Family', condo: 'Condo/Townhome', commercial: 'Commercial' };
@@ -569,7 +572,13 @@ async function uploadPhotoToCloudinary() {
       body: formData
     });
     const data = await res.json();
-    return data.secure_url || '';
+    console.log('Cloudinary response:', data);
+    if (data.secure_url) {
+      return data.secure_url;
+    } else {
+      console.error('Cloudinary error:', data.error);
+      return '';
+    }
   } catch(e) {
     console.error('Cloudinary upload failed:', e);
     return '';
