@@ -228,6 +228,11 @@
       <!-- STEP 4: Estimate result (populated by JS) -->
       <div class="sp" id="p4"></div>
 
+      <!-- Persistent photo input — always in DOM so file reference is never lost -->
+      <div id="photoInputWrap" style="display:none;">
+        <input type="file" id="fphoto" accept="image/*" onchange="handlePhotoUpload(this)"/>
+      </div>
+
     </div>
   </div>
 </section>
