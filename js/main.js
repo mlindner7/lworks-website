@@ -586,7 +586,7 @@ async function uploadPhotoToCloudinary() {
       alert('Photo uploaded: ' + data.secure_url.substring(0, 60) + '...');
       return data.secure_url;
     } else {
-      alert('Cloudinary error: ' + JSON.stringify(data.error));
+      alert('Cloudinary full response: ' + JSON.stringify(data));
       return '';
     }
   } catch(e) {
