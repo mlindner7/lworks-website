@@ -316,8 +316,6 @@ function buildEstimate() {
 
   // Minimum spinner delay
   setTimeout(() => {
-
-  (() => {
     const items = Object.values(selectedItems);
     const catGroups = {};
     let totalLow = 0, totalHigh = 0;
