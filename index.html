@@ -201,6 +201,8 @@
         </div>
         <p style="font-size:11px;color:var(--lt);margin-top:12px;text-align:center;">🔒 Your information is kept private and will never be sold or shared with third parties.</p>
         <p style="font-size:11px;color:var(--lt);text-align:center;margin-top:14px;">🔒 Your information is used only to prepare your estimate and coordinate your appointment. We never sell or share your data.</p>
+        <!-- Photo input lives here permanently so it's never wiped by dynamic DOM -->
+        <input type="file" id="fphoto" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)"/>
       </div>
 
       <!-- STEP 2: Granular service selection -->
@@ -228,10 +230,7 @@
       <!-- STEP 4: Estimate result (populated by JS) -->
       <div class="sp" id="p4"></div>
 
-      <!-- Persistent photo input — always in DOM so file reference is never lost -->
-      <div id="photoInputWrap" style="display:none;">
-        <input type="file" id="fphoto" accept="image/*" onchange="handlePhotoUpload(this)"/>
-      </div>
+
 
     </div>
   </div>
