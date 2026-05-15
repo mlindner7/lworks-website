@@ -456,14 +456,14 @@ function buildEstimate() {
 // =============================================
 function selContactChip(el) {
   document.querySelectorAll('.contact-chip').forEach(c => {
-    c.style.background = 'rgba(255,255,255,.15)';
-    c.style.borderColor = 'rgba(255,255,255,.35)';
-    c.style.color = '#fff';
+    c.style.background = 'transparent';
+    c.style.borderColor = 'var(--br)';
+    c.style.color = 'var(--mid)';
     c.removeAttribute('data-selected');
   });
-  el.style.background = '#fff';
-  el.style.borderColor = '#fff';
-  el.style.color = '#5b2fc9';
+  el.style.background = 'rgba(91,47,201,.08)';
+  el.style.borderColor = 'var(--p)';
+  el.style.color = 'var(--p)';
   el.setAttribute('data-selected', 'true');
 }
 
