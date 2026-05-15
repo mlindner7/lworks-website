@@ -235,7 +235,16 @@
             <input type="text" id="faddress" placeholder="123 Main St, Sussex WI 53089" autocomplete="street-address"/>
           </div>
         </div>
-        <p style="font-size:11px;color:var(--lt);margin-top:12px;text-align:center;">🔒 Your info is kept private and never sold or shared.</p>
+        <div style="margin-top:16px;">
+          <div class="prop-lbl" style="margin-bottom:8px;">Preferred Contact Method <span style="font-weight:400;color:var(--mid)">(optional)</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="contact-chip" data-val="Call" onclick="selContactChip(this)" style="background:rgba(255,255,255,0);border:1.5px solid var(--br);border-radius:50px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;">📞 Call</button>
+            <button type="button" class="contact-chip" data-val="Text" onclick="selContactChip(this)" style="background:rgba(255,255,255,0);border:1.5px solid var(--br);border-radius:50px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;">💬 Text</button>
+            <button type="button" class="contact-chip" data-val="Email" onclick="selContactChip(this)" style="background:rgba(255,255,255,0);border:1.5px solid var(--br);border-radius:50px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;">✉️ Email</button>
+            <button type="button" class="contact-chip" data-val="No preference" onclick="selContactChip(this)" style="background:rgba(255,255,255,0);border:1.5px solid var(--br);border-radius:50px;padding:8px 18px;font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .15s;">No preference</button>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--lt);margin-top:14px;text-align:center;">🔒 Your info is kept private and never sold or shared.</p>
         <div class="fa" style="margin-top:24px;">
           <button class="btn-back" onclick="goStep(3)">← Back</button>
           <button class="btn-primary" id="submitInfoBtn" onclick="submitInfo()">Send My Estimate & Book →</button>
