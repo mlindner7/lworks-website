@@ -160,21 +160,59 @@
   <div class="est-wrap">
     <!-- Step indicators -->
     <div class="steps-row" role="list">
-      <div class="st active" id="si1" role="listitem"><div class="sn">1</div><div class="sl">Your Info</div></div>
+      <div class="st active" id="si1" role="listitem"><div class="sn">1</div><div class="sl">Services</div></div>
       <div class="st-line" id="ln1"></div>
-      <div class="st inactive" id="si2" role="listitem"><div class="sn">2</div><div class="sl">Services</div></div>
+      <div class="st inactive" id="si2" role="listitem"><div class="sn">2</div><div class="sl">Property</div></div>
       <div class="st-line" id="ln2"></div>
-      <div class="st inactive" id="si3" role="listitem"><div class="sn">3</div><div class="sl">Property</div></div>
+      <div class="st inactive" id="si3" role="listitem"><div class="sn">3</div><div class="sl">Estimate</div></div>
       <div class="st-line" id="ln3"></div>
-      <div class="st inactive" id="si4" role="listitem"><div class="sn">4</div><div class="sl">Estimate</div></div>
+      <div class="st inactive" id="si4" role="listitem"><div class="sn">4</div><div class="sl">Your Info</div></div>
     </div>
 
     <div class="form-box">
 
-      <!-- STEP 1: Contact info -->
+      <!-- STEP 1: Service selection -->
       <div class="sp active" id="p1">
-        <div class="ft">Let's start with your info</div>
-        <div class="fh">We'll send your estimate here and reach out to confirm details.</div>
+        <div class="ft">What do you need done?</div>
+        <div class="fh">Tap to expand each category. Combining 2+ categories saves you money.</div>
+
+        <div id="catContainer"></div>
+
+        <div class="bundle-note" id="bn">
+          🎉 <span>You qualify for a <strong>bundle discount</strong> — savings will show in your estimate!</span>
+        </div>
+
+        <div class="sel-summary" id="selSummary" style="margin-top:8px;">Select at least one service below</div>
+
+        <div style="margin-top:20px;">
+          <div class="prop-lbl" style="margin-bottom:8px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional — helps us estimate better)</span></div>
+          <label class="photo-upload-label" for="fphoto" id="photoLabel">
+            <div class="photo-upload-icon">📷</div>
+            <div class="photo-upload-text">Tap to add a photo of the area you'd like serviced</div>
+            <div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div>
+            <input type="file" id="fphoto" accept="image/*" style="display:none;"/>
+          </label>
+          <div id="photoPreview" style="display:none;margin-top:10px;position:relative;">
+            <img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/>
+            <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top:20px;">
+          <button class="btn-primary" onclick="nextStep1()">Next: Property Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Property — built dynamically by buildStep3() in main.js -->
+      <div class="sp" id="p2"></div>
+
+      <!-- STEP 3: Estimate result (populated by JS) -->
+      <div class="sp" id="p3"></div>
+
+      <!-- STEP 4: Contact info — shown after estimate accepted -->
+      <div class="sp" id="p4">
+        <div class="ft">Almost there!</div>
+        <div class="fh">Just a couple quick things so we can confirm your booking.</div>
         <div class="form-row">
           <div class="form-group">
             <label for="fname">First Name *</label>
@@ -197,51 +235,12 @@
             <input type="text" id="faddress" placeholder="123 Main St, Sussex WI 53089" autocomplete="street-address"/>
           </div>
         </div>
-        <p style="font-size:11px;color:var(--lt);margin-top:12px;text-align:center;">🔒 Your information is kept private and will never be sold or shared with third parties.</p>
-
-        <div style="margin-top:20px;">
-          <div class="prop-lbl" style="margin-bottom:8px;">Upload a Photo <span style="font-weight:400;color:var(--mid)">(optional — helps us estimate better)</span></div>
-          <label class="photo-upload-label" for="fphoto" id="photoLabel">
-            <div class="photo-upload-icon">📷</div>
-            <div class="photo-upload-text">Tap to add a photo of the area you'd like serviced</div>
-            <div class="photo-upload-sub">JPG, PNG or HEIC · Max 10MB</div>
-            <input type="file" id="fphoto" accept="image/*" style="display:none;"/>
-          </label>
-          <div id="photoPreview" style="display:none;margin-top:10px;position:relative;">
-            <img id="photoThumb" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:2px solid var(--br);"/>
-            <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-          </div>
-        </div>
-
-        <div class="form-actions" style="margin-top:24px;">
-          <button class="btn-primary" onclick="nextStep1()">Next: Choose Services →</button>
+        <p style="font-size:11px;color:var(--lt);margin-top:12px;text-align:center;">🔒 Your info is kept private and never sold or shared.</p>
+        <div class="fa" style="margin-top:24px;">
+          <button class="btn-back" onclick="goStep(3)">← Back</button>
+          <button class="btn-primary" id="submitInfoBtn" onclick="submitInfo()">Send My Estimate & Book →</button>
         </div>
       </div>
-
-      <!-- STEP 2: Granular service selection -->
-      <div class="sp" id="p2">
-        <div class="ft">Which services do you need?</div>
-        <div class="fh">Tap to expand each category and select specific services. Combining 2+ categories saves you money.</div>
-
-        <div id="catContainer"></div>
-
-        <div class="bundle-note" id="bn">
-          🎉 <span>You qualify for a <strong>bundle discount</strong> — savings will show in your estimate!</span>
-        </div>
-
-        <div class="sel-summary" id="selSummary" style="margin-top:8px;">Select at least one service below</div>
-
-        <div class="fa">
-          <button class="btn-back" onclick="goStep(1)">← Back</button>
-          <button class="btn-primary" onclick="nextStep2()">Next: Property Details →</button>
-        </div>
-      </div>
-
-      <!-- STEP 3: Property — built dynamically by buildStep3() in main.js -->
-      <div class="sp" id="p3"></div>
-
-      <!-- STEP 4: Estimate result (populated by JS) -->
-      <div class="sp" id="p4"></div>
 
     </div>
   </div>
