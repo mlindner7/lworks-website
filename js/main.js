@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   buildCategoryBlocks();
 
-  // Photo input lives in Step 1 static HTML — wire it up once
+  // Photo input is in static step 1 HTML — wire once on load
   const photoInput = document.getElementById('fphoto');
   if (photoInput) photoInput.addEventListener('change', handlePhotoUpload);
 });
@@ -131,35 +131,109 @@ function goStep(n) {
 }
 
 // =============================================
-// STEP 1 — Contact info + photo
+// STEP 1 — Service selection
 // =============================================
 function nextStep1() {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
-  const email = document.getElementById('femail').value.trim();
-  const address = document.getElementById('faddress').value.trim();
-
-  if (!fname || !lname || !email || !address) {
-    alert('Please fill in your name, email, and service address to continue.');
+  if (Object.keys(selectedItems).length === 0) {
+    alert('Please select at least one service to continue.');
     return;
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert('Please enter a valid email address.');
-    return;
-  }
-
-  userData = {
-    firstName: fname,
-    lastName: lname,
-    email,
-    phone: document.getElementById('fphone').value.trim(),
-    address
-  };
+  buildStep2();
   goStep(2);
 }
 
 // =============================================
-// STEP 2 — Service selection
+// STEP 2 — Dynamic property questions
+// =============================================
+function buildStep2() {
+  const p2 = document.getElementById('p2');
+  const cats = new Set(Object.values(selectedItems).map(v => v.catKey));
+  const ids = new Set(Object.keys(selectedItems));
+
+  const hasExterior = cats.has('exterior');
+  const hasLawn = cats.has('lawn');
+  const hasAuto = cats.has('auto');
+  const hasCarp = ids.has('carp');
+  const hasHaul = ids.has('haul');
+  const hasSeas = ids.has('seas');
+  const needsLot = hasExterior || hasLawn || hasSeas || hasCarp || hasHaul;
+
+  let html = `
+    <div class="ft">Tell us about your property</div>
+    <div class="fh">Helps us give you the most accurate estimate.</div>`;
+
+  if (needsLot) {
+    html += `
+    <div class="prop-lbl">Property / Lot Size</div>
+    <div class="po" id="po-size">
+      <div class="popt ${propSize==='sm'?'sel':''}" onclick="selProp(this,'size')" data-val="sm">Small<br><span style="font-size:10px;font-weight:400">Under ¼ acre</span></div>
+      <div class="popt ${propSize==='md'?'sel':''}" onclick="selProp(this,'size')" data-val="md">Medium<br><span style="font-size:10px;font-weight:400">¼–½ acre</span></div>
+      <div class="popt ${propSize==='lg'?'sel':''}" onclick="selProp(this,'size')" data-val="lg">Large<br><span style="font-size:10px;font-weight:400">½–1 acre</span></div>
+      <div class="popt ${propSize==='xl'?'sel':''}" onclick="selProp(this,'size')" data-val="xl">Extra Large<br><span style="font-size:10px;font-weight:400">1+ acre</span></div>
+    </div>
+
+    <div class="prop-lbl">Home Type</div>
+    <div class="po" id="po-type">
+      <div class="popt ${propType==='single'?'sel':''}" onclick="selProp(this,'type')" data-val="single">Single Family</div>
+      <div class="popt ${propType==='multi'?'sel':''}" onclick="selProp(this,'type')" data-val="multi">Multi-Family</div>
+      <div class="popt ${propType==='condo'?'sel':''}" onclick="selProp(this,'type')" data-val="condo">Condo / Townhome</div>
+      <div class="popt ${propType==='commercial'?'sel':''}" onclick="selProp(this,'type')" data-val="commercial">Commercial</div>
+    </div>`;
+  }
+
+  if (hasExterior) {
+    html += `
+    <div class="prop-lbl">Number of Stories</div>
+    <div class="po" id="po-stories">
+      <div class="popt ${propStories==='1'?'sel':''}" onclick="selProp(this,'stories')" data-val="1">1 Story</div>
+      <div class="popt ${propStories==='2'?'sel':''}" onclick="selProp(this,'stories')" data-val="2">2 Stories</div>
+      <div class="popt ${propStories==='3'?'sel':''}" onclick="selProp(this,'stories')" data-val="3">3+ Stories</div>
+    </div>`;
+  }
+
+  if (hasCarp) {
+    html += `
+    <div class="prop-lbl">How many rooms need carpet cleaning?</div>
+    <div class="po" id="po-carpet">
+      <div class="popt ${carpetRooms==='1'?'sel':''}" onclick="selProp(this,'carpet')" data-val="1">1 Room</div>
+      <div class="popt ${carpetRooms==='2'?'sel':''}" onclick="selProp(this,'carpet')" data-val="2">2 Rooms</div>
+      <div class="popt ${carpetRooms==='3'?'sel':''}" onclick="selProp(this,'carpet')" data-val="3">3 Rooms</div>
+      <div class="popt ${carpetRooms==='4'?'sel':''}" onclick="selProp(this,'carpet')" data-val="4">4+ Rooms</div>
+    </div>`;
+  }
+
+  if (hasHaul) {
+    html += `
+    <div class="prop-lbl">Haul Load Size</div>
+    <div class="po" id="po-haul">
+      <div class="popt ${haulLoad==='single'?'sel':''}" onclick="selProp(this,'haul')" data-val="single">Single Item<br><span style="font-size:10px;font-weight:400">Couch, appliance, etc.</span></div>
+      <div class="popt ${haulLoad==='partial'?'sel':''}" onclick="selProp(this,'haul')" data-val="partial">Partial Load<br><span style="font-size:10px;font-weight:400">A few items</span></div>
+      <div class="popt ${haulLoad==='full'?'sel':''}" onclick="selProp(this,'haul')" data-val="full">Full Load<br><span style="font-size:10px;font-weight:400">Van/truck full</span></div>
+    </div>`;
+  }
+
+  if (hasAuto) {
+    html += `
+    <div class="prop-lbl">Vehicle(s) Being Serviced</div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <input type="text" id="vehicleInput" placeholder="e.g. 2019 Honda Accord, 2021 Ford F-150" value="${vehicleInfo}" style="background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:10px 14px;color:var(--dk);font-size:13px;font-family:var(--fn);width:100%;" oninput="vehicleInfo=this.value"/>
+    </div>`;
+  }
+
+  html += `
+    <label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label>
+    <textarea id="fnotes" placeholder="e.g. gate code, preferred timing, access notes…" style="margin-top:6px;"></textarea>
+
+    <div class="fa">
+      <button class="btn-back" onclick="goStep(1)">← Back</button>
+      <button class="btn-primary" onclick="buildEstimate()">Get My Estimate →</button>
+    </div>`;
+
+  p2.innerHTML = html;
+}
+
+// =============================================
+// STEP 3 — Build estimate
 // =============================================
 function buildCategoryBlocks() {
   const container = document.getElementById('catContainer');
@@ -254,104 +328,8 @@ function nextStep2() {
     alert('Please select at least one service to continue.');
     return;
   }
-  buildStep3();
-  goStep(3);
-}
-
-// =============================================
-// STEP 3 — Dynamic property questions
-// =============================================
-function buildStep3() {
-  const p3 = document.getElementById('p3');
-  const cats = new Set(Object.values(selectedItems).map(v => v.catKey));
-  const ids = new Set(Object.keys(selectedItems));
-
-  const hasExterior = cats.has('exterior');
-  const hasLawn = cats.has('lawn');
-  const hasAuto = cats.has('auto');
-  const hasCarp = ids.has('carp');
-  const hasHaul = ids.has('haul');
-  const hasSeas = ids.has('seas');
-  const needsLot = hasExterior || hasLawn || hasSeas || hasCarp || hasHaul;
-
-  let html = `
-    <div class="ft">Tell us about your property</div>
-    <div class="fh">Helps us give you the most accurate estimate.</div>`;
-
-  // Lot size — exterior, lawn, seasonal, carpet, hauling
-  if (needsLot) {
-    html += `
-    <div class="prop-lbl">Property / Lot Size</div>
-    <div class="po" id="po-size">
-      <div class="popt ${propSize==='sm'?'sel':''}" onclick="selProp(this,'size')" data-val="sm">Small<br><span style="font-size:10px;font-weight:400">Under ¼ acre</span></div>
-      <div class="popt ${propSize==='md'?'sel':''}" onclick="selProp(this,'size')" data-val="md">Medium<br><span style="font-size:10px;font-weight:400">¼–½ acre</span></div>
-      <div class="popt ${propSize==='lg'?'sel':''}" onclick="selProp(this,'size')" data-val="lg">Large<br><span style="font-size:10px;font-weight:400">½–1 acre</span></div>
-      <div class="popt ${propSize==='xl'?'sel':''}" onclick="selProp(this,'size')" data-val="xl">Extra Large<br><span style="font-size:10px;font-weight:400">1+ acre</span></div>
-    </div>
-
-    <div class="prop-lbl">Home Type</div>
-    <div class="po" id="po-type">
-      <div class="popt ${propType==='single'?'sel':''}" onclick="selProp(this,'type')" data-val="single">Single Family</div>
-      <div class="popt ${propType==='multi'?'sel':''}" onclick="selProp(this,'type')" data-val="multi">Multi-Family</div>
-      <div class="popt ${propType==='condo'?'sel':''}" onclick="selProp(this,'type')" data-val="condo">Condo / Townhome</div>
-      <div class="popt ${propType==='commercial'?'sel':''}" onclick="selProp(this,'type')" data-val="commercial">Commercial</div>
-    </div>`;
-  }
-
-  // Stories — exterior only (window/gutter/screen/pressure)
-  if (hasExterior) {
-    html += `
-    <div class="prop-lbl">Number of Stories</div>
-    <div class="po" id="po-stories">
-      <div class="popt ${propStories==='1'?'sel':''}" onclick="selProp(this,'stories')" data-val="1">1 Story</div>
-      <div class="popt ${propStories==='2'?'sel':''}" onclick="selProp(this,'stories')" data-val="2">2 Stories</div>
-      <div class="popt ${propStories==='3'?'sel':''}" onclick="selProp(this,'stories')" data-val="3">3+ Stories</div>
-    </div>`;
-  }
-
-  // Carpet rooms
-  if (hasCarp) {
-    html += `
-    <div class="prop-lbl">How many rooms need carpet cleaning?</div>
-    <div class="po" id="po-carpet">
-      <div class="popt ${carpetRooms==='1'?'sel':''}" onclick="selProp(this,'carpet')" data-val="1">1 Room</div>
-      <div class="popt ${carpetRooms==='2'?'sel':''}" onclick="selProp(this,'carpet')" data-val="2">2 Rooms</div>
-      <div class="popt ${carpetRooms==='3'?'sel':''}" onclick="selProp(this,'carpet')" data-val="3">3 Rooms</div>
-      <div class="popt ${carpetRooms==='4'?'sel':''}" onclick="selProp(this,'carpet')" data-val="4">4+ Rooms</div>
-    </div>`;
-  }
-
-  // Haul load size
-  if (hasHaul) {
-    html += `
-    <div class="prop-lbl">Haul Load Size</div>
-    <div class="po" id="po-haul">
-      <div class="popt ${haulLoad==='single'?'sel':''}" onclick="selProp(this,'haul')" data-val="single">Single Item<br><span style="font-size:10px;font-weight:400">Couch, appliance, etc.</span></div>
-      <div class="popt ${haulLoad==='partial'?'sel':''}" onclick="selProp(this,'haul')" data-val="partial">Partial Load<br><span style="font-size:10px;font-weight:400">A few items</span></div>
-      <div class="popt ${haulLoad==='full'?'sel':''}" onclick="selProp(this,'haul')" data-val="full">Full Load<br><span style="font-size:10px;font-weight:400">Van/truck full</span></div>
-    </div>`;
-  }
-
-  // Vehicle — auto services
-  if (hasAuto) {
-    html += `
-    <div class="prop-lbl">Vehicle(s) Being Serviced</div>
-    <div class="form-group" style="margin-bottom:14px;">
-      <input type="text" id="vehicleInput" placeholder="e.g. 2019 Honda Accord, 2021 Ford F-150" value="${vehicleInfo}" style="background:#fff;border:1.5px solid #d1d9e6;border-radius:8px;padding:10px 14px;color:var(--dk);font-size:13px;font-family:var(--fn);width:100%;" oninput="vehicleInfo=this.value"/>
-    </div>`;
-  }
-
-  // Notes always
-  html += `
-    <label class="prop-lbl" style="display:block;margin-top:16px;">Anything else we should know? <span style="font-weight:400;color:var(--mid)">(optional)</span></label>
-    <textarea id="fnotes" placeholder="e.g. gate code, preferred timing, access notes…" style="margin-top:6px;">${document.getElementById('fnotes') ? document.getElementById('fnotes').value : ''}</textarea>
-
-    <div class="fa">
-      <button class="btn-back" onclick="goStep(2)">← Back</button>
-      <button class="btn-primary" onclick="buildEstimate()">Build My Estimate →</button>
-    </div>`;
-
-  p3.innerHTML = html;
+  buildStep2();
+  goStep(2);
 }
 
 function selProp(el, group) {
@@ -370,36 +348,32 @@ function selProp(el, group) {
 // STEP 4 — Build estimate
 // =============================================
 function buildEstimate() {
-  const p4 = document.getElementById('p4');
-  p4.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><p style="color:var(--mid);font-size:13px;font-weight:600;margin-top:8px;">Building your estimate…</p></div>`;
-  goStep(4);
+  const p3 = document.getElementById('p3');
+  p3.innerHTML = `<div class="spin-wrap"><div class="spinner"></div><p style="color:var(--mid);font-size:13px;font-weight:600;margin-top:8px;">Building your estimate…</p></div>`;
+  goStep(3);
 
   setTimeout(() => {
     const items = Object.values(selectedItems);
     const catGroups = {};
     let totalLow = 0, totalHigh = 0;
 
-    // Stories multiplier for exterior
     const storiesMultiplier = { '1': 1, '2': 1.45, '3': 1.85 }[propStories] || 1;
 
     items.forEach(({ catKey, item }) => {
       let lo = item.low[propSize] || item.low.md;
       let hi = item.high[propSize] || item.high.md;
 
-      // Exterior: adjust for stories
       if (catKey === 'exterior' && propStories !== '1') {
         lo = Math.round(lo * storiesMultiplier);
         hi = Math.round(hi * storiesMultiplier);
       }
 
-      // Carpet: adjust for room count (base = 2 rooms)
       if (item.id === 'carp') {
         const roomFactor = { '1': 0.6, '2': 1, '3': 1.45, '4': 1.85 }[carpetRooms] || 1;
         lo = Math.round(lo * roomFactor);
         hi = Math.round(hi * roomFactor);
       }
 
-      // Hauling: adjust for load size (base = partial)
       if (item.id === 'haul') {
         const haulFactor = { single: 0.7, partial: 1, full: 1.6 }[haulLoad] || 1;
         lo = Math.round(lo * haulFactor);
@@ -412,7 +386,6 @@ function buildEstimate() {
       catGroups[catKey].push({ name: item.name, lo, hi });
     });
 
-    // Bundle discount
     const catCount = Object.keys(catGroups).length;
     const itemCount = items.length;
     let discountLow = 0, discountHigh = 0;
@@ -447,7 +420,10 @@ function buildEstimate() {
     const customDesc = document.getElementById('custom-desc');
     const customText = customDesc ? customDesc.value.trim() : '';
 
-    p4.innerHTML = `
+    // Store estimate data for use in step 4
+    window._estimateData = { calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh, customText };
+
+    p3.innerHTML = `
       <div class="result">
         <div class="chk">✓</div>
         <p style="color:var(--mid);font-size:13px;font-weight:600;margin-bottom:4px;">Your Estimate Range</p>
@@ -463,22 +439,11 @@ function buildEstimate() {
         <p class="en">This is a ballpark range — final price may vary based on property condition and exact scope. We'll confirm before any work begins. <strong>No deposit required to book.</strong></p>
 
         <div class="ecta">
-          <h3>Ready to pick your date?</h3>
-          <p>How would you like us to reach you to confirm?</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">
-            <button type="button" class="contact-chip" data-val="No preference" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">No preference</button>
-            <button type="button" class="contact-chip" data-val="Email" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">📧 Email</button>
-            <button type="button" class="contact-chip" data-val="Phone / Text" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">📱 Phone / Text</button>
-            <button type="button" class="contact-chip" data-val="Facebook Messenger" onclick="selContactChip(this)" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:#fff;font-family:var(--fn);font-size:12px;font-weight:700;padding:7px 16px;cursor:pointer;transition:all .15s;">💬 Messenger</button>
+          <h3>Like what you see?</h3>
+          <p>Enter your info and we'll confirm the details and get you booked.</p>
+          <div class="ecta-btns" style="margin-top:12px;">
+            <button class="btn-white" onclick="goStep(4)">✅ Book This — Enter My Info →</button>
           </div>
-          <div class="ecta-btns">
-            <button class="btn-white" id="acceptBtn" onclick="acceptEstimate('${calendlyRoute}', '${servicesText.replace(/'/g,"\\'")}', ${totalLow}, ${totalHigh}, ${discountLow}, ${discountHigh})">✅ Accept Estimate & Book</button>
-          </div>
-        </div>
-
-        <div id="bookingUnlocked" style="display:none;background:rgba(45,181,75,.1);border:1px solid rgba(45,181,75,.3);border-radius:12px;padding:18px;margin-top:12px;text-align:center;">
-          <p style="font-size:13px;font-weight:700;color:#2db54b;margin-bottom:12px;">✅ Estimate accepted — choose your date below!</p>
-          <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-primary">📅 Book My Appointment</a>
         </div>
 
         <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;margin-top:4px;">← Start Over</button>
@@ -487,7 +452,7 @@ function buildEstimate() {
 }
 
 // =============================================
-// ACCEPT ESTIMATE — Cloudinary upload + EmailJS
+// STEP 4 — Collect info then fire EmailJS + Cloudinary
 // =============================================
 function selContactChip(el) {
   document.querySelectorAll('.contact-chip').forEach(c => {
@@ -502,14 +467,35 @@ function selContactChip(el) {
   el.setAttribute('data-selected', 'true');
 }
 
-async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh) {
-  const btn = document.getElementById('acceptBtn');
+async function submitInfo() {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const address = document.getElementById('faddress').value.trim();
+
+  if (!fname || !lname || !email || !address) {
+    alert('Please fill in your name, email, and service address to continue.');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  userData = {
+    firstName: fname,
+    lastName: lname,
+    email,
+    phone: document.getElementById('fphone').value.trim(),
+    address
+  };
+
+  const btn = document.getElementById('submitInfoBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
+  const { calendlyRoute, servicesText, totalLow, totalHigh, discountLow, discountHigh, customText } = window._estimateData || {};
   const sizeLabels = { sm: 'Small lot (under ¼ acre)', md: 'Medium lot (¼–½ acre)', lg: 'Large lot (½–1 acre)', xl: 'Extra large (1+ acre)' };
   const typeLabels = { single: 'Single Family', multi: 'Multi-Family', condo: 'Condo/Townhome', commercial: 'Commercial' };
-  const customDesc = document.getElementById('custom-desc');
-  const customText = customDesc ? customDesc.value.trim() : '';
   const notes = document.getElementById('fnotes') ? document.getElementById('fnotes').value.trim() : '';
 
   // --- Cloudinary photo upload ---
@@ -520,23 +506,12 @@ async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, 
       formData.append('file', photoFile);
       formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
       formData.append('public_id', 'lworks_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7));
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/image/upload`, { method: 'POST', body: formData });
       const data = await res.json();
-
-      if (data.secure_url) {
-        photoUrl = data.secure_url;
-      } else {
-        photoUrl = 'Upload failed — see console';
-        console.error('Cloudinary error:', data);
-      }
+      photoUrl = data.secure_url || 'Upload failed';
     } catch (err) {
-      console.error('Cloudinary fetch error:', err);
-      photoUrl = 'Upload error — see console';
+      console.error('Cloudinary error:', err);
+      photoUrl = 'Upload error';
     }
   }
 
@@ -565,9 +540,16 @@ async function acceptEstimate(calendlyRoute, servicesText, totalLow, totalHigh, 
     console.error('EmailJS error:', e);
   }
 
-  if (btn) btn.closest('.ecta').style.display = 'none';
-  const unlocked = document.getElementById('bookingUnlocked');
-  if (unlocked) unlocked.style.display = 'block';
+  // Show success + Calendly link
+  document.getElementById('p4').innerHTML = `
+    <div class="result" style="text-align:center;padding:16px 0;">
+      <div class="chk">✓</div>
+      <div class="ft" style="margin-bottom:8px;">You're all set, ${userData.firstName}!</div>
+      <p style="color:var(--mid);font-size:13px;margin-bottom:24px;">Your estimate has been sent to ${userData.email}. Pick a time below and we'll confirm everything before the job.</p>
+      <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-primary" style="margin-bottom:16px;">📅 Book My Appointment</a>
+      <br/><br/>
+      <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;">← Start Over</button>
+    </div>`;
 }
 
 // =============================================
@@ -583,13 +565,7 @@ function resetTool() {
   vehicleInfo = '';
   photoFile = null;
   userData = {};
-
-  ['fname','lname','femail','fphone','faddress'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-
-  clearPhoto();
+  window._estimateData = null;
 
   document.querySelectorAll('.item-row').forEach(r => r.classList.remove('sel'));
   document.querySelectorAll('.cat-block').forEach(b => b.classList.remove('has-sel','open'));
@@ -597,6 +573,19 @@ function resetTool() {
 
   const bn = document.getElementById('bn');
   if (bn) bn.style.display = 'none';
+
+  const selSummary = document.getElementById('selSummary');
+  if (selSummary) selSummary.innerHTML = 'Select at least one service below';
+
+  // Clear step 4 inputs
+  ['fname','lname','femail','fphone','faddress'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // Re-enable submit button if it was disabled
+  const submitBtn = document.getElementById('submitInfoBtn');
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send My Estimate & Book →'; }
 
   goStep(1);
 }
