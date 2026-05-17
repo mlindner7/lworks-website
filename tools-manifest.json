@@ -1,0 +1,22 @@
+{
+  "name": "LWorks Books",
+  "short_name": "LWorks Books",
+  "description": "LWorks income and expense tracker",
+  "start_url": "/tools.html",
+  "display": "standalone",
+  "background_color": "#0a1628",
+  "theme_color": "#0a1628",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/shield.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/shield.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

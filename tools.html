@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LWorks">
+<meta name="theme-color" content="#0a1628">
+<link rel="manifest" href="/tools-manifest.json">
+<title>LWorks Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{
+  --navy:#0a1628;--navy2:#0f1e38;--navy3:#162040;
+  --teal:#1bbfaa;--teal-bright:#22d4bc;--green:#2ecc71;
+  --red:#e74c3c;--amber:#f5a623;--text:#e2e8f0;
+  --muted:rgba(255,255,255,.5);--border:rgba(255,255,255,.08);
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100dvh;padding-top:calc(var(--safe-top) + 8px);padding-bottom:calc(var(--safe-bottom) + 72px);overscroll-behavior:none;}
+
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--navy2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100;}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:color .2s;touch-action:manipulation;}
+.tab-btn.active{color:var(--teal-bright);}
+.tab-icon{font-size:19px;line-height:1;}
+
+.page{display:none;padding:1.25rem 1rem 0;max-width:680px;margin:0 auto;}
+.page.active{display:block;}
+
+.page-header{margin-bottom:1.25rem;}
+.header-badge{display:inline-block;background:rgba(27,191,170,.15);border:1px solid rgba(27,191,170,.3);color:var(--teal-bright);font-size:.63rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.28rem .75rem;border-radius:20px;margin-bottom:.5rem;}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;background:linear-gradient(135deg,var(--teal-bright),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:.2rem;}
+.page-header p{color:var(--muted);font-size:.82rem;}
+
+.card{background:var(--navy2);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--teal-bright);margin-bottom:1rem;letter-spacing:.05em;}
+
+.field{margin-bottom:.85rem;}
+.field label{display:block;font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.32rem;}
+.field input,.field select,.field textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;padding:.68rem .9rem;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);}
+.field select option{background:var(--navy2);}
+.field textarea{resize:vertical;min-height:72px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.price-wrap{position:relative;}
+.price-wrap span{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);color:var(--teal-bright);font-size:1.1rem;font-weight:600;pointer-events:none;}
+.price-wrap input{padding-left:1.8rem !important;font-size:1.3rem !important;font-weight:600;color:var(--teal-bright) !important;}
+
+.send-btn{width:100%;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;padding:.9rem;cursor:pointer;touch-action:manipulation;transition:opacity .2s;}
+.send-btn:disabled{opacity:.5;}
+.add-btn-green{width:100%;background:linear-gradient(135deg,var(--green),#27ae60);border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;padding:.82rem;cursor:pointer;touch-action:manipulation;}
+.add-btn-red{width:100%;background:linear-gradient(135deg,var(--red),#c0392b);border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;padding:.82rem;cursor:pointer;touch-action:manipulation;}
+.export-btn{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;padding:.75rem;cursor:pointer;touch-action:manipulation;margin-bottom:.75rem;}
+
+.service-groups{display:flex;flex-direction:column;gap:.9rem;}
+.group-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.18rem .65rem;border-radius:12px;display:inline-block;margin-bottom:.4rem;}
+.sg-exterior .group-label{background:rgba(56,189,248,.15);color:#38bdf8;}
+.sg-lawn .group-label{background:rgba(74,222,128,.15);color:#4ade80;}
+.sg-auto .group-label{background:rgba(167,139,250,.15);color:#a78bfa;}
+.sg-additional .group-label{background:rgba(251,146,60,.15);color:#fb923c;}
+.btn-group{display:flex;flex-wrap:wrap;gap:.45rem;}
+.svc-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.45rem .8rem;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+.svc-btn.active-exterior{background:rgba(56,189,248,.2);border-color:#38bdf8;color:#38bdf8;}
+.svc-btn.active-lawn{background:rgba(74,222,128,.2);border-color:#4ade80;color:#4ade80;}
+.svc-btn.active-auto{background:rgba(167,139,250,.2);border-color:#a78bfa;color:#a78bfa;}
+.svc-btn.active-additional{background:rgba(251,146,60,.2);border-color:#fb923c;color:#fb923c;}
+
+.status-msg{text-align:center;padding:.6rem 1rem;border-radius:10px;font-size:.82rem;margin-top:.75rem;display:none;}
+.status-msg.success{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:var(--green);display:block;}
+.status-msg.error{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:var(--red);display:block;}
+
+.summary-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;}
+.summary-card{background:var(--navy2);border:1px solid var(--border);border-radius:14px;padding:.9rem 1.1rem;}
+.summary-card.full{grid-column:1/-1;}
+.sc-label{font-size:.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;}
+.sc-value{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;}
+.sc-value.green{color:var(--green);}
+.sc-value.red{color:var(--red);}
+.sc-value.teal{background:linear-gradient(135deg,var(--teal-bright),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sc-sub{font-size:.7rem;color:var(--muted);margin-top:.15rem;}
+
+.list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem;}
+.list-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--teal-bright);letter-spacing:.05em;}
+.clear-btn{background:none;border:1px solid rgba(231,76,60,.3);color:var(--red);font-size:.7rem;font-weight:600;padding:.28rem .65rem;border-radius:20px;cursor:pointer;touch-action:manipulation;}
+.filter-row{display:flex;gap:.45rem;margin-bottom:.85rem;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.7rem;font-weight:600;padding:.3rem .8rem;cursor:pointer;white-space:nowrap;touch-action:manipulation;}
+.filter-chip.active{background:rgba(27,191,170,.15);border-color:var(--teal);color:var(--teal-bright);}
+.entry-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem;}
+.entry{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:.8rem .9rem;display:flex;align-items:center;gap:.7rem;}
+.entry-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.entry-dot.green{background:var(--green);}
+.entry-dot.red{background:var(--red);}
+.entry-info{flex:1;min-width:0;}
+.entry-name{font-size:.88rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.entry-meta{font-size:.7rem;color:var(--muted);margin-top:2px;}
+.entry-amount{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;flex-shrink:0;}
+.entry-amount.green{color:var(--green);}
+.entry-amount.red{color:var(--red);}
+.entry-delete{background:none;border:none;color:rgba(255,255,255,.2);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0;touch-action:manipulation;}
+.entry-delete:active{color:var(--red);}
+.empty-state{text-align:center;padding:1.5rem 1rem;color:var(--muted);font-size:.83rem;}
+
+.month-row{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem;}
+.month-name{font-size:.88rem;font-weight:600;}
+.month-nums{display:flex;gap:.75rem;font-size:.78rem;}
+.mn-in{color:var(--green);font-weight:600;}
+.mn-out{color:var(--red);font-weight:600;}
+.mn-net{color:var(--teal-bright);font-weight:700;}
+.year-select-wrap{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+.year-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.75rem;font-weight:600;padding:.35rem .9rem;cursor:pointer;touch-action:manipulation;}
+.year-chip.active{background:rgba(27,191,170,.15);border-color:var(--teal);color:var(--teal-bright);}
+.mile-display{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--teal-bright);text-align:center;padding:.5rem 0;}
+.mile-sub{text-align:center;color:var(--muted);font-size:.78rem;margin-bottom:1rem;}
+
+@media(max-width:400px){.grid2{grid-template-columns:1fr;}.month-nums{gap:.4rem;font-size:.72rem;}}
+</style>
+</head>
+<body>
+
+<!-- INVOICE -->
+<div class="page active" id="page-invoice">
+  <div class="page-header">
+    <div class="header-badge">LWorks Internal</div>
+    <h1>Invoice Sender</h1>
+    <p>Send invoice — auto-logs to income.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Customer Info</div>
+    <div class="grid2">
+      <div class="field"><label>Name</label><input type="text" id="cust-name" placeholder="John Smith" autocomplete="name"></div>
+      <div class="field"><label>Email</label><input type="email" id="cust-email" placeholder="john@email.com" autocomplete="email"></div>
+    </div>
+    <div class="field"><label>Service Address</label><input type="text" id="cust-address" placeholder="123 Main St, Sussex, WI"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Services Completed</div>
+    <div class="service-groups">
+      <div class="sg-exterior">
+        <span class="group-label">🪟 Exterior Cleaning</span>
+        <div class="btn-group">
+          <button type="button" class="svc-btn" data-group="exterior" data-value="Window Cleaning" onclick="toggleSvc(this)">Window Cleaning</button>
+          <button type="button" class="svc-btn" data-group="exterior" data-value="Screen Cleaning" onclick="toggleSvc(this)">Screen Cleaning</button>
+          <button type="button" class="svc-btn" data-group="exterior" data-value="Gutter Cleaning" onclick="toggleSvc(this)">Gutter Cleaning</button>
+          <button type="button" class="svc-btn" data-group="exterior" data-value="Pressure Washing" onclick="toggleSvc(this)">Pressure Washing</button>
+        </div>
+      </div>
+      <div class="sg-lawn">
+        <span class="group-label">🌿 Lawn Care</span>
+        <div class="btn-group">
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Lawn Mowing" onclick="toggleSvc(this)">Lawn Mowing</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Lawn Trimming" onclick="toggleSvc(this)">Lawn Trimming</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Pruning" onclick="toggleSvc(this)">Pruning</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Tree Trimming" onclick="toggleSvc(this)">Tree Trimming</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Mulching" onclick="toggleSvc(this)">Mulching</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Weeding" onclick="toggleSvc(this)">Weeding</button>
+          <button type="button" class="svc-btn" data-group="lawn" data-value="Leaf Cleanup" onclick="toggleSvc(this)">Leaf Cleanup</button>
+        </div>
+      </div>
+      <div class="sg-auto">
+        <span class="group-label">🚗 Auto Services</span>
+        <div class="btn-group">
+          <button type="button" class="svc-btn" data-group="auto" data-value="Oil Change" onclick="toggleSvc(this)">Oil Change</button>
+          <button type="button" class="svc-btn" data-group="auto" data-value="Disc Brakes" onclick="toggleSvc(this)">Disc Brakes</button>
+          <button type="button" class="svc-btn" data-group="auto" data-value="Light Interior Detailing" onclick="toggleSvc(this)">Interior Detailing</button>
+        </div>
+      </div>
+      <div class="sg-additional">
+        <span class="group-label">📦 Additional</span>
+        <div class="btn-group">
+          <button type="button" class="svc-btn" data-group="additional" data-value="Carpet Cleaning" onclick="toggleSvc(this)">Carpet Cleaning</button>
+          <button type="button" class="svc-btn" data-group="additional" data-value="Local Hauling" onclick="toggleSvc(this)">Local Hauling</button>
+          <button type="button" class="svc-btn" data-group="additional" data-value="Seasonal / Winter Services" onclick="toggleSvc(this)">Seasonal / Winter</button>
+          <button type="button" class="svc-btn" data-group="additional" data-value="Other" onclick="toggleSvc(this)">Other</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Invoice Total</div>
+    <div class="field">
+      <label>Total Amount</label>
+      <div class="price-wrap"><span>$</span><input type="number" id="total" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field">
+      <label>Payment Method</label>
+      <select id="inv-method">
+        <option value="Zelle">Zelle</option>
+        <option value="Venmo">Venmo</option>
+        <option value="Cash App">Cash App</option>
+        <option value="Cash">Cash</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Job Notes (Optional)</div>
+    <div class="field"><textarea id="job-notes" placeholder="Notes about the job, follow-up items..."></textarea></div>
+  </div>
+  <button type="button" class="send-btn" id="send-btn" onclick="sendInvoice()">Send Invoice to Customer</button>
+  <div class="status-msg" id="inv-status"></div>
+</div>
+
+<!-- INCOME -->
+<div class="page" id="page-income">
+  <div class="page-header">
+    <div class="header-badge">LWorks Internal</div>
+    <h1>Income</h1>
+    <p>Auto-logged from invoices. Add cash jobs manually.</p>
+  </div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="sc-label">This Month</div><div class="sc-value green" id="inc-month">$0</div><div class="sc-sub" id="inc-month-count">0 jobs</div></div>
+    <div class="summary-card"><div class="sc-label">This Year</div><div class="sc-value green" id="inc-year">$0</div><div class="sc-sub" id="inc-year-count">0 total</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Manual Entry</div>
+    <div class="grid2">
+      <div class="field"><label>Customer</label><input type="text" id="inc-customer" placeholder="John Smith"></div>
+      <div class="field"><label>Amount</label><input type="number" id="inc-amount" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field"><label>Service(s)</label><input type="text" id="inc-service" placeholder="e.g. Lawn Mow, Gutters"></div>
+    <div class="grid2">
+      <div class="field"><label>Date</label><input type="date" id="inc-date"></div>
+      <div class="field"><label>Payment Method</label>
+        <select id="inc-method">
+          <option value="Zelle">Zelle</option><option value="Venmo">Venmo</option>
+          <option value="Cash App">Cash App</option><option value="Cash">Cash</option><option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <button class="add-btn-green" onclick="addIncomeManual()">+ Log Cash Job</button>
+    <div class="status-msg" id="inc-status"></div>
+  </div>
+  <div class="list-header"><div class="list-title">Payment History</div><button class="clear-btn" onclick="clearAll('income')">Clear All</button></div>
+  <div class="filter-row" id="inc-filters"></div>
+  <div class="entry-list" id="inc-list"><div class="empty-state">No payments logged yet.</div></div>
+</div>
+
+<!-- EXPENSES -->
+<div class="page" id="page-expenses">
+  <div class="page-header">
+    <div class="header-badge">LWorks Internal</div>
+    <h1>Expenses</h1>
+    <p>Track every business cost for taxes.</p>
+  </div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="sc-label">This Month</div><div class="sc-value red" id="exp-month">$0</div><div class="sc-sub" id="exp-month-count">0 expenses</div></div>
+    <div class="summary-card"><div class="sc-label">This Year</div><div class="sc-value red" id="exp-year">$0</div><div class="sc-sub" id="exp-year-count">0 total</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Log an Expense</div>
+    <div class="grid2">
+      <div class="field"><label>Description</label><input type="text" id="exp-desc" placeholder="e.g. Brake pads"></div>
+      <div class="field"><label>Amount</label><input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Category (Schedule C)</label>
+        <select id="exp-category">
+          <option value="Parts & Materials">Parts & Materials</option>
+          <option value="Fuel">Fuel</option>
+          <option value="Tools & Equipment">Tools & Equipment</option>
+          <option value="Advertising & Marketing">Advertising & Marketing</option>
+          <option value="Software & Subscriptions">Software & Subscriptions</option>
+          <option value="Vehicle Maintenance">Vehicle Maintenance</option>
+          <option value="Supplies">Supplies</option>
+          <option value="Meals (Business)">Meals (Business)</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="exp-date"></div>
+    </div>
+    <button class="add-btn-red" onclick="addExpense()">+ Log Expense</button>
+    <div class="status-msg" id="exp-status"></div>
+  </div>
+  <div class="list-header"><div class="list-title">Expense History</div><button class="clear-btn" onclick="clearAll('expenses')">Clear All</button></div>
+  <div class="filter-row" id="exp-filters"></div>
+  <div class="entry-list" id="exp-list"><div class="empty-state">No expenses logged yet.</div></div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="page" id="page-overview">
+  <div class="page-header">
+    <div class="header-badge">LWorks Internal</div>
+    <h1>Overview</h1>
+    <p>P&amp;L, taxes, mileage — all in one place.</p>
+  </div>
+  <div class="year-select-wrap" id="year-chips"></div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="sc-label">Total Income</div><div class="sc-value green" id="ov-income">$0</div></div>
+    <div class="summary-card"><div class="sc-label">Total Expenses</div><div class="sc-value red" id="ov-expenses">$0</div></div>
+    <div class="summary-card full"><div class="sc-label">Net Profit</div><div class="sc-value teal" id="ov-net">$0</div><div class="sc-sub" id="ov-margin"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">By Month</div>
+    <div id="month-breakdown"><div class="empty-state">No data yet.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Expenses by Category (Schedule C)</div>
+    <div id="cat-breakdown"><div class="empty-state">No expenses yet.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚐 Mileage Log</div>
+    <div class="grid2">
+      <div class="field"><label>Odometer — Jan 1</label><input type="number" id="mile-start" placeholder="e.g. 84200" oninput="saveMileage()"></div>
+      <div class="field"><label>Odometer — Dec 31</label><input type="number" id="mile-end" placeholder="e.g. 96400" oninput="saveMileage()"></div>
+    </div>
+    <div class="mile-display" id="mile-total">— miles</div>
+    <div class="mile-sub" id="mile-deduction"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Export for Taxes</div>
+    <button class="export-btn" onclick="exportCSV('income')">⬇ Export Income CSV</button>
+    <button class="export-btn" onclick="exportCSV('expenses')">⬇ Export Expenses CSV</button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('invoice')" id="tab-invoice"><span class="tab-icon">📋</span>Invoice</button>
+  <button class="tab-btn" onclick="switchTab('income')" id="tab-income"><span class="tab-icon">💰</span>Income</button>
+  <button class="tab-btn" onclick="switchTab('expenses')" id="tab-expenses"><span class="tab-icon">🧾</span>Expenses</button>
+  <button class="tab-btn" onclick="switchTab('overview')" id="tab-overview"><span class="tab-icon">📊</span>Overview</button>
+</div>
+
+<script>
+emailjs.init('ojcDVPCld5mc6jCXf');
+
+const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage'};
+function load(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]');}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'{}');}catch{return{};}}
+function save(k,d){localStorage.setItem(KEYS[k],JSON.stringify(d));}
+
+function today(){return new Date().toISOString().split('T')[0];}
+function currentMonth(){return today().slice(0,7);}
+function currentYear(){return today().slice(0,4);}
+function monthKey(d){return d?d.slice(0,7):'';}
+function yearKey(d){return d?d.slice(0,4):'';}
+function formatMonth(ym){if(!ym)return '';const[y,m]=ym.split('-');return new Date(y,m-1).toLocaleDateString('en-US',{month:'long',year:'numeric'});}
+function fmt(n){return '$'+Number(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function showStatus(el,type,msg){el.className='status-msg '+type;el.textContent=msg;setTimeout(()=>el.className='status-msg',3500);}
+
+function switchTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  window.scrollTo(0,0);
+  if(tab==='overview')renderOverview();
+  if(tab==='income')renderIncome();
+  if(tab==='expenses')renderExpenses();
+}
+
+// INVOICE
+function toggleSvc(btn){btn.classList.toggle('active-'+btn.dataset.group);}
+function getSelectedServices(){return Array.from(document.querySelectorAll('.svc-btn[class*="active-"]')).map(b=>b.dataset.value);}
+
+async function sendInvoice(){
+  const name=document.getElementById('cust-name').value.trim();
+  const email=document.getElementById('cust-email').value.trim();
+  const address=document.getElementById('cust-address').value.trim();
+  const total=document.getElementById('total').value.trim();
+  const notes=document.getElementById('job-notes').value.trim();
+  const method=document.getElementById('inv-method').value;
+  const services=getSelectedServices();
+  const statusEl=document.getElementById('inv-status');
+
+  if(!name||!email||!total||services.length===0){showStatus(statusEl,'error','Fill in name, email, services, and total.');return;}
+
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;btn.textContent='Sending...';
+
+  try{
+    await emailjs.send('service_6ethcqb','template_cezqhvi',{
+      customer_name:name,customer_email:email,
+      services:services.join(', '),
+      total:'$'+parseFloat(total).toFixed(2),
+      notes:notes||''
+    });
+
+    // Auto-log to income
+    const entry={id:Date.now(),customer:name,email,address,amount:parseFloat(total),services:services.join(', '),date:today(),method,notes,source:'invoice'};
+    const data=load('income');data.unshift(entry);save('income',data);
+
+    showStatus(statusEl,'success','Invoice sent & logged — '+fmt(total)+' from '+name);
+    btn.textContent='Send Invoice to Customer';btn.disabled=false;
+    ['cust-name','cust-email','cust-address','total','job-notes'].forEach(id=>document.getElementById(id).value='');
+    document.querySelectorAll('.svc-btn').forEach(b=>b.className='svc-btn');
+  }catch(err){
+    showStatus(statusEl,'error','Failed to send. Check connection and try again.');
+    btn.textContent='Send Invoice to Customer';btn.disabled=false;
+  }
+}
+
+// INCOME
+function addIncomeManual(){
+  const customer=document.getElementById('inc-customer').value.trim();
+  const amount=parseFloat(document.getElementById('inc-amount').value);
+  const service=document.getElementById('inc-service').value.trim();
+  const date=document.getElementById('inc-date').value||today();
+  const method=document.getElementById('inc-method').value;
+  const statusEl=document.getElementById('inc-status');
+  if(!customer||!amount||amount<=0){showStatus(statusEl,'error','Customer and amount required.');return;}
+  const data=load('income');
+  data.unshift({id:Date.now(),customer,amount,services:service,date,method,source:'manual'});
+  save('income',data);
+  ['inc-customer','inc-amount','inc-service'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inc-date').value='';
+  showStatus(statusEl,'success',fmt(amount)+' from '+customer+' logged!');
+  renderIncome();
+}
+
+let incFilter='all';
+function renderIncome(filter){
+  if(filter!==undefined)incFilter=filter;
+  const data=load('income');
+  const mData=data.filter(e=>monthKey(e.date)===currentMonth());
+  const yData=data.filter(e=>yearKey(e.date)===currentYear());
+  document.getElementById('inc-month').textContent=fmt(mData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('inc-month-count').textContent=mData.length+' job'+(mData.length!==1?'s':'');
+  document.getElementById('inc-year').textContent=fmt(yData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('inc-year-count').textContent=data.length+' total';
+  const months=[...new Set(data.map(e=>monthKey(e.date)))].filter(Boolean).sort().reverse();
+  document.getElementById('inc-filters').innerHTML=['all',...months].map(m=>`<div class="filter-chip ${incFilter===m?'active':''}" onclick="renderIncome('${m}')">${m==='all'?'All':formatMonth(m)}</div>`).join('');
+  const filtered=incFilter==='all'?data:data.filter(e=>monthKey(e.date)===incFilter);
+  const list=document.getElementById('inc-list');
+  if(!filtered.length){list.innerHTML='<div class="empty-state">No payments logged yet.</div>';return;}
+  list.innerHTML=filtered.map(e=>`
+    <div class="entry">
+      <div class="entry-dot green"></div>
+      <div class="entry-info">
+        <div class="entry-name">${e.customer}${e.services?' · '+e.services:''}</div>
+        <div class="entry-meta">${e.date} · ${e.method||''}${e.source==='invoice'?' · 📋':' · 💵'}</div>
+      </div>
+      <div class="entry-amount green">${fmt(e.amount)}</div>
+      <button class="entry-delete" onclick="deleteEntry('income',${e.id})">✕</button>
+    </div>`).join('');
+}
+
+// EXPENSES
+function addExpense(){
+  const desc=document.getElementById('exp-desc').value.trim();
+  const amount=parseFloat(document.getElementById('exp-amount').value);
+  const category=document.getElementById('exp-category').value;
+  const date=document.getElementById('exp-date').value||today();
+  const statusEl=document.getElementById('exp-status');
+  if(!desc||!amount||amount<=0){showStatus(statusEl,'error','Description and amount required.');return;}
+  const data=load('expenses');
+  data.unshift({id:Date.now(),desc,amount,category,date});
+  save('expenses',data);
+  ['exp-desc','exp-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('exp-date').value='';
+  showStatus(statusEl,'success',fmt(amount)+' expense logged!');
+  renderExpenses();
+}
+
+let expFilter='all';
+function renderExpenses(filter){
+  if(filter!==undefined)expFilter=filter;
+  const data=load('expenses');
+  const mData=data.filter(e=>monthKey(e.date)===currentMonth());
+  const yData=data.filter(e=>yearKey(e.date)===currentYear());
+  document.getElementById('exp-month').textContent=fmt(mData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('exp-month-count').textContent=mData.length+' expense'+(mData.length!==1?'s':'');
+  document.getElementById('exp-year').textContent=fmt(yData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('exp-year-count').textContent=data.length+' total';
+  const months=[...new Set(data.map(e=>monthKey(e.date)))].filter(Boolean).sort().reverse();
+  document.getElementById('exp-filters').innerHTML=['all',...months].map(m=>`<div class="filter-chip ${expFilter===m?'active':''}" onclick="renderExpenses('${m}')">${m==='all'?'All':formatMonth(m)}</div>`).join('');
+  const filtered=expFilter==='all'?data:data.filter(e=>monthKey(e.date)===expFilter);
+  const list=document.getElementById('exp-list');
+  if(!filtered.length){list.innerHTML='<div class="empty-state">No expenses logged yet.</div>';return;}
+  list.innerHTML=filtered.map(e=>`
+    <div class="entry">
+      <div class="entry-dot red"></div>
+      <div class="entry-info">
+        <div class="entry-name">${e.desc}</div>
+        <div class="entry-meta">${e.date} · ${e.category}</div>
+      </div>
+      <div class="entry-amount red">${fmt(e.amount)}</div>
+      <button class="entry-delete" onclick="deleteEntry('expenses',${e.id})">✕</button>
+    </div>`).join('');
+}
+
+// OVERVIEW
+let ovYear=currentYear();
+function renderOverview(year){
+  if(year)ovYear=year;
+  const income=load('income'),expenses=load('expenses');
+  const allYears=[...new Set([...income.map(e=>yearKey(e.date)),...expenses.map(e=>yearKey(e.date))])].filter(Boolean).sort().reverse();
+  if(!allYears.includes(ovYear))ovYear=allYears[0]||currentYear();
+  document.getElementById('year-chips').innerHTML=allYears.map(y=>`<div class="year-chip ${ovYear===y?'active':''}" onclick="renderOverview('${y}')">${y}</div>`).join('')||`<div class="year-chip active">${currentYear()}</div>`;
+  const yIn=income.filter(e=>yearKey(e.date)===ovYear);
+  const yEx=expenses.filter(e=>yearKey(e.date)===ovYear);
+  const totalIn=yIn.reduce((s,e)=>s+e.amount,0);
+  const totalOut=yEx.reduce((s,e)=>s+e.amount,0);
+  const net=totalIn-totalOut;
+  document.getElementById('ov-income').textContent=fmt(totalIn);
+  document.getElementById('ov-expenses').textContent=fmt(totalOut);
+  document.getElementById('ov-net').textContent=fmt(net);
+  document.getElementById('ov-margin').textContent=totalIn>0?((net/totalIn)*100).toFixed(1)+'% profit margin':'';
+  const months=[...new Set([...yIn.map(e=>monthKey(e.date)),...yEx.map(e=>monthKey(e.date))])].filter(Boolean).sort().reverse();
+  const mbEl=document.getElementById('month-breakdown');
+  if(!months.length){mbEl.innerHTML='<div class="empty-state">No data for this year.</div>';}
+  else{mbEl.innerHTML=months.map(m=>{
+    const mIn=yIn.filter(e=>monthKey(e.date)===m).reduce((s,e)=>s+e.amount,0);
+    const mOut=yEx.filter(e=>monthKey(e.date)===m).reduce((s,e)=>s+e.amount,0);
+    return`<div class="month-row"><div class="month-name">${formatMonth(m)}</div><div class="month-nums"><span class="mn-in">+${fmt(mIn)}</span><span class="mn-out">-${fmt(mOut)}</span><span class="mn-net">${fmt(mIn-mOut)}</span></div></div>`;
+  }).join('');}
+  const cats={};yEx.forEach(e=>{cats[e.category]=(cats[e.category]||0)+e.amount;});
+  const catEl=document.getElementById('cat-breakdown');
+  if(!Object.keys(cats).length){catEl.innerHTML='<div class="empty-state">No expenses for this year.</div>';}
+  else{catEl.innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`<div class="month-row"><div class="month-name">${cat}</div><div class="mn-out">${fmt(amt)}</div></div>`).join('');}
+  loadMileage();
+}
+
+// MILEAGE
+const IRS_RATE=0.70;
+function saveMileage(){
+  const start=parseFloat(document.getElementById('mile-start').value)||0;
+  const end=parseFloat(document.getElementById('mile-end').value)||0;
+  save('mileage',{start,end});updateMileDisplay(start,end);
+}
+function loadMileage(){
+  const m=loadObj('mileage');
+  if(m.start)document.getElementById('mile-start').value=m.start;
+  if(m.end)document.getElementById('mile-end').value=m.end;
+  updateMileDisplay(m.start||0,m.end||0);
+}
+function updateMileDisplay(start,end){
+  const miles=end>start?end-start:0;
+  document.getElementById('mile-total').textContent=miles?miles.toLocaleString()+' miles':'— miles';
+  document.getElementById('mile-deduction').textContent=miles?'Est. deduction: '+fmt(miles*IRS_RATE)+' @ $'+IRS_RATE+'/mi (IRS rate)':'Enter odometer readings above';
+}
+
+// EXPORT
+function exportCSV(type){
+  const data=load(type);
+  if(!data.length){alert('No '+type+' data to export.');return;}
+  let csv,filename;
+  if(type==='income'){
+    csv='Date,Customer,Email,Address,Services,Amount,Method,Source\n'+data.map(e=>`${e.date},"${e.customer}","${e.email||''}","${e.address||''}","${e.services||''}",${e.amount},${e.method||''},${e.source||''}`).join('\n');
+    filename='lworks_income_'+currentYear()+'.csv';
+  }else{
+    csv='Date,Description,Category,Amount\n'+data.map(e=>`${e.date},"${e.desc}","${e.category}",${e.amount}`).join('\n');
+    filename='lworks_expenses_'+currentYear()+'.csv';
+  }
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+// DELETE / CLEAR
+function deleteEntry(key,id){if(!confirm('Delete this entry?'))return;save(key,load(key).filter(e=>e.id!==id));key==='income'?renderIncome():renderExpenses();}
+function clearAll(key){if(!confirm('Clear ALL '+key+'? Cannot be undone.'))return;save(key,[]);key==='income'?renderIncome():renderExpenses();}
+
+// INIT
+document.getElementById('inc-date').value=today();
+document.getElementById('exp-date').value=today();
+renderIncome();renderExpenses();
+</script>
+</body>
+</html>
