@@ -22,6 +22,20 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100dvh;padding-top:calc(var(--safe-top) + 8px);padding-bottom:calc(var(--safe-bottom) + 72px);overscroll-behavior:none;}
+#pin-screen{position:fixed;inset:0;background:var(--navy);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+#pin-screen.hidden{display:none;}
+.pin-badge{background:rgba(27,191,170,.15);border:1px solid rgba(27,191,170,.3);color:var(--teal-bright);font-size:.63rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.28rem .75rem;border-radius:20px;margin-bottom:1rem;}
+.pin-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;background:linear-gradient(135deg,var(--teal-bright),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.25rem;}
+.pin-sub{color:var(--muted);font-size:.82rem;margin-bottom:2rem;}
+.pin-dots{display:flex;gap:14px;margin-bottom:2rem;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.2);transition:all .15s;}
+.pin-dot.filled{background:var(--teal-bright);border-color:var(--teal-bright);}
+.pin-dot.error{background:var(--red);border-color:var(--red);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;max-width:280px;width:100%;}
+.pin-key{background:var(--navy2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1.4rem;font-weight:600;padding:1.1rem;cursor:pointer;touch-action:manipulation;transition:background .15s;}
+.pin-key:active{background:var(--navy3);}
+.pin-key.del{font-size:1rem;color:var(--muted);}
+.pin-error{color:var(--red);font-size:.8rem;margin-top:.75rem;min-height:1.2rem;}
 
 .tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--navy2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100;}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:color .2s;touch-action:manipulation;}
@@ -318,6 +332,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </div>
 
+<!-- PIN LOCK -->
+<div id="pin-screen">
+  <div class="pin-badge">LWorks Internal</div>
+  <div class="pin-title">LWorks Tools</div>
+  <div class="pin-sub">Enter your PIN to continue</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <div></div>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+</div>
+
 <!-- TAB BAR -->
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('invoice')" id="tab-invoice"><span class="tab-icon">📋</span>Invoice</button>
@@ -327,6 +369,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </div>
 
 <script>
+// PIN
+const CORRECT='1810';
+let pinEntry='';
+function pinKey(k){
+  if(pinEntry.length>=4)return;
+  pinEntry+=k;
+  document.getElementById('d'+(pinEntry.length-1)).classList.add('filled');
+  if(pinEntry.length===4){
+    if(pinEntry===CORRECT){
+      setTimeout(()=>document.getElementById('pin-screen').classList.add('hidden'),200);
+    }else{
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));
+      document.getElementById('pin-error').textContent='Incorrect PIN';
+      setTimeout(()=>{
+        pinEntry='';
+        document.querySelectorAll('.pin-dot').forEach(d=>{d.classList.remove('filled','error');});
+        document.getElementById('pin-error').textContent='';
+      },800);
+    }
+  }
+}
+function pinDel(){
+  if(!pinEntry.length)return;
+  document.getElementById('d'+(pinEntry.length-1)).classList.remove('filled');
+  pinEntry=pinEntry.slice(0,-1);
+}
+
 emailjs.init('ojcDVPCld5mc6jCXf');
 
 const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage'};
