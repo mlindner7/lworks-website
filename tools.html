@@ -117,6 +117,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .entry-amount.red{color:var(--red);}
 .entry-delete{background:none;border:none;color:rgba(255,255,255,.2);font-size:15px;cursor:pointer;padding:4px;flex-shrink:0;touch-action:manipulation;}
 .entry-delete:active{color:var(--red);}
+.entry-edit{background:none;border:none;color:rgba(255,255,255,.28);font-size:14px;cursor:pointer;padding:4px;flex-shrink:0;touch-action:manipulation;}
+.entry-edit:active{color:var(--teal-bright);}
+.entry-dot.teal{background:var(--teal-bright);}
 .empty-state{text-align:center;padding:1.5rem 1rem;color:var(--muted);font-size:.83rem;}
 
 .month-row{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem;}
@@ -145,6 +148,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div class="card">
     <div class="card-title">Customer Info</div>
+    <div class="field" id="inv-client-wrap" style="display:none"><label>⚡ Quick-fill saved client</label><select id="inv-client-picker" onchange="pickClient('inv',this.value)"></select></div>
     <div class="grid2">
       <div class="field"><label>Name</label><input type="text" id="cust-name" placeholder="John Smith" autocomplete="name"></div>
       <div class="field"><label>Email</label><input type="email" id="cust-email" placeholder="john@email.com" autocomplete="email"></div>
@@ -232,6 +236,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div class="card">
     <div class="card-title">Manual Entry</div>
+    <div class="field" id="inc-client-wrap" style="display:none"><label>⚡ Quick-fill saved client</label><select id="inc-client-picker" onchange="pickClient('inc',this.value)"></select></div>
     <div class="grid2">
       <div class="field"><label>Customer</label><input type="text" id="inc-customer" placeholder="John Smith"></div>
       <div class="field"><label>Amount</label><input type="number" id="inc-amount" placeholder="0.00" min="0" step="0.01"></div>
@@ -330,6 +335,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <button class="export-btn" onclick="exportCSV('income')">⬇ Export Income CSV</button>
     <button class="export-btn" onclick="exportCSV('expenses')">⬇ Export Expenses CSV</button>
   </div>
+  <div class="card">
+    <div class="card-title">💾 Backup &amp; Restore</div>
+    <p style="color:var(--muted);font-size:.78rem;margin:-.4rem 0 .9rem;">Saves everything — income, expenses, clients &amp; mileage — to one file. Use it to move to a new phone.</p>
+    <button class="export-btn" onclick="backupAll()">⬇ Backup All Data</button>
+    <button class="export-btn" onclick="document.getElementById('restore-file').click()">⬆ Restore from Backup</button>
+    <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="restoreBackup(event)">
+    <div class="status-msg" id="backup-status"></div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="page" id="page-clients">
+  <div class="page-header">
+    <div class="header-badge">LWorks Internal</div>
+    <h1>Clients</h1>
+    <p>Saved customers — autofill on invoices &amp; income.</p>
+  </div>
+  <div class="card">
+    <div class="card-title" id="client-form-title">Add Client</div>
+    <input type="hidden" id="client-edit-id" value="">
+    <div class="grid2">
+      <div class="field"><label>Name</label><input type="text" id="cl-name" placeholder="John Smith"></div>
+      <div class="field"><label>Phone</label><input type="tel" id="cl-phone" placeholder="262-555-1234"></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="cl-email" placeholder="john@email.com"></div>
+    <div class="field"><label>Service Address</label><input type="text" id="cl-address" placeholder="123 Main St, Sussex, WI"></div>
+    <div class="field"><label>Notes (optional)</label><textarea id="cl-notes" placeholder="Gate code, dog, preferred days..."></textarea></div>
+    <button class="add-btn-green" id="cl-save-btn" onclick="saveClient()">+ Save Client</button>
+    <button class="export-btn" id="cl-cancel-btn" style="display:none;margin-top:.6rem" onclick="resetClientForm()">Cancel Edit</button>
+    <div class="status-msg" id="cl-status"></div>
+  </div>
+  <div class="list-header"><div class="list-title">Saved Clients</div><span class="sc-sub" id="cl-count"></span></div>
+  <div class="entry-list" id="cl-list"><div class="empty-state">No clients saved yet.</div></div>
 </div>
 
 <!-- PIN LOCK -->
@@ -363,6 +401,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <!-- TAB BAR -->
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('invoice')" id="tab-invoice"><span class="tab-icon">📋</span>Invoice</button>
+  <button class="tab-btn" onclick="switchTab('clients')" id="tab-clients"><span class="tab-icon">👥</span>Clients</button>
   <button class="tab-btn" onclick="switchTab('income')" id="tab-income"><span class="tab-icon">💰</span>Income</button>
   <button class="tab-btn" onclick="switchTab('expenses')" id="tab-expenses"><span class="tab-icon">🧾</span>Expenses</button>
   <button class="tab-btn" onclick="switchTab('overview')" id="tab-overview"><span class="tab-icon">📊</span>Overview</button>
@@ -398,7 +437,7 @@ function pinDel(){
 
 emailjs.init('ojcDVPCld5mc6jCXf');
 
-const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage'};
+const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage',clients:'lworks_clients_v1'};
 function load(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]');}catch{return[];}}
 function loadObj(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'{}');}catch{return{};}}
 function save(k,d){localStorage.setItem(KEYS[k],JSON.stringify(d));}
@@ -421,6 +460,7 @@ function switchTab(tab){
   if(tab==='overview')renderOverview();
   if(tab==='income')renderIncome();
   if(tab==='expenses')renderExpenses();
+  if(tab==='clients')renderClients();
 }
 
 // INVOICE
@@ -453,10 +493,12 @@ async function sendInvoice(){
     // Auto-log to income
     const entry={id:Date.now(),customer:name,email,address,amount:parseFloat(total),services:services.join(', '),date:today(),method,notes,source:'invoice'};
     const data=load('income');data.unshift(entry);save('income',data);
+    upsertClient({name,email,address});
 
     showStatus(statusEl,'success','Invoice sent & logged — '+fmt(total)+' from '+name);
     btn.textContent='Send Invoice to Customer';btn.disabled=false;
     ['cust-name','cust-email','cust-address','total','job-notes'].forEach(id=>document.getElementById(id).value='');
+    const ip=document.getElementById('inv-client-picker');if(ip)ip.value='';
     document.querySelectorAll('.svc-btn').forEach(b=>b.className='svc-btn');
   }catch(err){
     showStatus(statusEl,'error','Failed to send. Check connection and try again.');
@@ -476,8 +518,10 @@ function addIncomeManual(){
   const data=load('income');
   data.unshift({id:Date.now(),customer,amount,services:service,date,method,source:'manual'});
   save('income',data);
+  upsertClient({name:customer});
   ['inc-customer','inc-amount','inc-service'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('inc-date').value='';
+  const cp=document.getElementById('inc-client-picker');if(cp)cp.value='';
   showStatus(statusEl,'success',fmt(amount)+' from '+customer+' logged!');
   renderIncome();
 }
@@ -507,6 +551,117 @@ function renderIncome(filter){
       <div class="entry-amount green">${fmt(e.amount)}</div>
       <button class="entry-delete" onclick="deleteEntry('income',${e.id})">✕</button>
     </div>`).join('');
+}
+
+// CLIENTS
+function upsertClient(c){
+  const name=(c.name||'').trim();if(!name)return;
+  const list=load('clients');
+  const email=(c.email||'').trim().toLowerCase();
+  let idx=-1;
+  if(email)idx=list.findIndex(x=>(x.email||'').trim().toLowerCase()===email);
+  if(idx<0)idx=list.findIndex(x=>(x.name||'').trim().toLowerCase()===name.toLowerCase());
+  if(idx>=0){
+    const ex=list[idx];
+    if(c.name)ex.name=c.name.trim();
+    if(c.email&&!ex.email)ex.email=c.email.trim();
+    if(c.address&&!ex.address)ex.address=c.address.trim();
+    if(c.phone&&!ex.phone)ex.phone=c.phone.trim();
+    if(c.notes&&!ex.notes)ex.notes=c.notes.trim();
+  }else{
+    list.push({id:Date.now(),name,email:(c.email||'').trim(),address:(c.address||'').trim(),phone:(c.phone||'').trim(),notes:(c.notes||'').trim()});
+  }
+  save('clients',list);
+  refreshClientPickers();
+}
+function refreshClientPickers(){
+  const list=load('clients').slice().sort((a,b)=>a.name.localeCompare(b.name));
+  const opts='<option value="">— Returning client —</option>'+list.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  ['inv','inc'].forEach(p=>{
+    const sel=document.getElementById(p+'-client-picker');
+    const wrap=document.getElementById(p+'-client-wrap');
+    if(!sel||!wrap)return;
+    sel.innerHTML=opts;
+    wrap.style.display=list.length?'block':'none';
+  });
+}
+function pickClient(which,id){
+  if(!id)return;
+  const c=load('clients').find(x=>String(x.id)===String(id));
+  if(!c)return;
+  if(which==='inv'){
+    document.getElementById('cust-name').value=c.name||'';
+    document.getElementById('cust-email').value=c.email||'';
+    document.getElementById('cust-address').value=c.address||'';
+  }else{
+    document.getElementById('inc-customer').value=c.name||'';
+  }
+}
+function saveClient(){
+  const name=document.getElementById('cl-name').value.trim();
+  const email=document.getElementById('cl-email').value.trim();
+  const phone=document.getElementById('cl-phone').value.trim();
+  const address=document.getElementById('cl-address').value.trim();
+  const notes=document.getElementById('cl-notes').value.trim();
+  const editId=document.getElementById('client-edit-id').value;
+  const statusEl=document.getElementById('cl-status');
+  if(!name){showStatus(statusEl,'error','Name is required.');return;}
+  const list=load('clients');
+  if(editId){
+    const c=list.find(x=>String(x.id)===String(editId));
+    if(c){c.name=name;c.email=email;c.phone=phone;c.address=address;c.notes=notes;}
+  }else{
+    list.push({id:Date.now(),name,email,phone,address,notes});
+  }
+  save('clients',list);
+  resetClientForm();
+  renderClients();
+  showStatus(document.getElementById('cl-status'),'success',name+' saved!');
+}
+function editClient(id){
+  const c=load('clients').find(x=>String(x.id)===String(id));
+  if(!c)return;
+  document.getElementById('client-edit-id').value=c.id;
+  document.getElementById('cl-name').value=c.name||'';
+  document.getElementById('cl-email').value=c.email||'';
+  document.getElementById('cl-phone').value=c.phone||'';
+  document.getElementById('cl-address').value=c.address||'';
+  document.getElementById('cl-notes').value=c.notes||'';
+  document.getElementById('client-form-title').textContent='Edit Client';
+  document.getElementById('cl-save-btn').textContent='✓ Update Client';
+  document.getElementById('cl-cancel-btn').style.display='block';
+  window.scrollTo(0,0);
+}
+function resetClientForm(){
+  document.getElementById('client-edit-id').value='';
+  ['cl-name','cl-email','cl-phone','cl-address','cl-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('client-form-title').textContent='Add Client';
+  document.getElementById('cl-save-btn').textContent='+ Save Client';
+  document.getElementById('cl-cancel-btn').style.display='none';
+}
+function deleteClient(id){
+  if(!confirm('Delete this client? (Past income & invoices stay logged.)'))return;
+  save('clients',load('clients').filter(x=>String(x.id)!==String(id)));
+  renderClients();
+}
+function renderClients(){
+  refreshClientPickers();
+  const list=load('clients').slice().sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('cl-count').textContent=list.length?list.length+(list.length===1?' client':' clients'):'';
+  const el=document.getElementById('cl-list');
+  if(!list.length){el.innerHTML='<div class="empty-state">No clients saved yet. They also save automatically when you send an invoice.</div>';return;}
+  el.innerHTML=list.map(c=>{
+    const meta=[c.phone,c.email,c.address].filter(Boolean).join(' · ');
+    return `<div class="entry">
+      <div class="entry-dot teal"></div>
+      <div class="entry-info">
+        <div class="entry-name">${c.name}</div>
+        <div class="entry-meta">${meta||'No contact info'}</div>
+      </div>
+      <button class="entry-edit" onclick="editClient(${c.id})">✎</button>
+      <button class="entry-delete" onclick="deleteClient(${c.id})">✕</button>
+    </div>`;
+  }).join('');
 }
 
 // EXPENSES
@@ -621,6 +776,35 @@ function exportCSV(type){
   const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
 }
 
+// BACKUP / RESTORE
+function backupAll(){
+  const data={app:'LWorks Tools',version:1,exported:new Date().toISOString(),
+    income:load('income'),expenses:load('expenses'),clients:load('clients'),mileage:loadObj('mileage')};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='lworks_backup_'+today()+'.json';a.click();URL.revokeObjectURL(url);
+}
+function restoreBackup(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const statusEl=document.getElementById('backup-status');
+  const reader=new FileReader();
+  reader.onload=function(){
+    try{
+      const d=JSON.parse(reader.result);
+      if(!d||(!Array.isArray(d.income)&&!Array.isArray(d.expenses)&&!Array.isArray(d.clients))){showStatus(statusEl,'error','Not a valid LWorks backup file.');ev.target.value='';return;}
+      if(!confirm('Restore this backup? It REPLACES all current income, expenses, clients & mileage on this device.')){ev.target.value='';return;}
+      save('income',Array.isArray(d.income)?d.income:[]);
+      save('expenses',Array.isArray(d.expenses)?d.expenses:[]);
+      save('clients',Array.isArray(d.clients)?d.clients:[]);
+      save('mileage',d.mileage&&typeof d.mileage==='object'?d.mileage:{});
+      renderIncome();renderExpenses();renderClients();renderOverview();
+      showStatus(statusEl,'success','Backup restored — all data loaded.');
+    }catch(e){showStatus(statusEl,'error','Could not read that file.');}
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
 // DELETE / CLEAR
 function deleteEntry(key,id){if(!confirm('Delete this entry?'))return;save(key,load(key).filter(e=>e.id!==id));key==='income'?renderIncome():renderExpenses();}
 function clearAll(key){if(!confirm('Clear ALL '+key+'? Cannot be undone.'))return;save(key,[]);key==='income'?renderIncome():renderExpenses();}
@@ -628,7 +812,7 @@ function clearAll(key){if(!confirm('Clear ALL '+key+'? Cannot be undone.'))retur
 // INIT
 document.getElementById('inc-date').value=today();
 document.getElementById('exp-date').value=today();
-renderIncome();renderExpenses();
+renderIncome();renderExpenses();renderClients();
 </script>
 </body>
 </html>
