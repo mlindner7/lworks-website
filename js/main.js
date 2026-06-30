@@ -14,7 +14,6 @@ const CONFIG = {
       lawn: 'lawn-care-services',
       auto: 'auto-service-appointment',
       additional: 'additional-services',
-      /* sparkle: 'sparkle-cleaning-appointment', — UNCOMMENT AT LAUNCH + create this event type in Calendly */
       multi: 'multi-service-appointment'
     }
   },
@@ -46,24 +45,10 @@ const SERVICES = {
     items: [
       { id: 'mow', name: 'Mowing (Trim & Blow)', desc: 'Full mow, edge trim, blowout', low: { sm:40, md:60, lg:90, xl:140 }, high: { sm:70, md:110, lg:160, xl:240 } },
       { id: 'prn', name: 'Pruning & Tree Trimming', desc: 'Shrubs, hedges, small trees', low: { sm:60, md:100, lg:160, xl:240 }, high: { sm:120, md:200, lg:320, xl:480 } },
-      { id: 'mul', name: 'Mulching & Bed Work', desc: 'Mulch install, edging, weeding', low: { sm:60, md:100, lg:160, xl:240 }, high: { sm:130, md:220, lg:340, xl:500 } },
-      { id: 'lnd', name: 'Light Landscaping', desc: 'Plantings & small projects — confirmed on site', low: { sm:80, md:120, lg:200, xl:300 }, high: { sm:160, md:260, lg:420, xl:620 } },
       { id: 'cln', name: 'Property Cleanup', desc: 'Leaf removal, debris hauling', low: { sm:60, md:100, lg:160, xl:260 }, high: { sm:120, md:200, lg:320, xl:480 } },
       { id: 'wat', name: 'Plant Watering', desc: 'Garden beds, containers, planters', low: { sm:30, md:50, lg:70, xl:100 }, high: { sm:60, md:90, lg:130, xl:180 } }
     ]
   },
-  /* ===== SPARKLE CLEANING — UNCOMMENT TO LAUNCH (set real prices with Chelsey first) =====
-  sparkle: {
-    label: 'Sparkle Cleaning',
-    icon: '✨',
-    items: [
-      { id: 'cstd', name: 'Standard Cleaning', desc: 'Kitchens, baths, floors, dusting', low: { sm:100, md:140, lg:190, xl:260 }, high: { sm:160, md:220, lg:300, xl:400 } },
-      { id: 'cdep', name: 'Deep Cleaning', desc: 'Top-to-bottom detail clean', low: { sm:180, md:250, lg:340, xl:460 }, high: { sm:280, md:400, lg:540, xl:720 } },
-      { id: 'cmov', name: 'Move-In / Move-Out', desc: 'Empty-home full clean', low: { sm:200, md:280, lg:380, xl:500 }, high: { sm:320, md:440, lg:600, xl:800 } },
-      { id: 'ccom', name: 'Office / Commercial', desc: 'Quoted on site after walk-through', low: { sm:120, md:180, lg:260, xl:380 }, high: { sm:240, md:360, lg:520, xl:760 } }
-    ]
-  },
-  ===== END SPARKLE ===== */
   auto: {
     label: 'Auto Services',
     icon: '🔧',
@@ -555,13 +540,23 @@ async function submitInfo() {
     console.error('EmailJS error:', e);
   }
 
+  // Prefill Calendly with the name + email they already entered (no retyping)
+  let bookingUrl = calendlyRoute || CONFIG.calendly.base;
+  try {
+    const prefill = new URLSearchParams({
+      name: `${userData.firstName} ${userData.lastName}`.trim(),
+      email: userData.email
+    });
+    bookingUrl += (bookingUrl.includes('?') ? '&' : '?') + prefill.toString();
+  } catch (e) { /* fall back to plain route */ }
+
   // Show success + Calendly link
   document.getElementById('p4').innerHTML = `
     <div class="result" style="text-align:center;padding:16px 0;">
       <div class="chk">✓</div>
       <div class="ft" style="margin-bottom:8px;">You're all set, ${userData.firstName}!</div>
       <p style="color:var(--mid);font-size:13px;margin-bottom:24px;">Your estimate has been sent to ${userData.email}. Pick a time below and we'll confirm everything before the job.</p>
-      <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-primary" style="margin-bottom:16px;">📅 Book My Appointment</a>
+      <a href="${bookingUrl}" target="_blank" rel="noopener" class="btn-primary" style="margin-bottom:16px;">📅 Book My Appointment</a>
       <br/><br/>
       <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;">← Start Over</button>
     </div>`;
