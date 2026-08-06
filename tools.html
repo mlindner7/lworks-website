@@ -135,6 +135,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .mile-sub{text-align:center;color:var(--muted);font-size:.78rem;margin-bottom:1rem;}
 
 @media(max-width:400px){.grid2{grid-template-columns:1fr;}.month-nums{gap:.4rem;font-size:.72rem;}}
+/* SPARKLE TAB */
+.header-badge.sparkle{background:rgba(224,64,143,.15);border-color:rgba(224,64,143,.3);color:#e0408f;}
+.page-header h1.sparkle{background:linear-gradient(135deg,#e0408f,#c9247a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.card-title.sparkle{color:#e0408f;}
+.add-btn-pink{width:100%;background:linear-gradient(135deg,#e0408f,#c9247a);border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;padding:.82rem;cursor:pointer;touch-action:manipulation;}
+.sc-value.pink{color:#e0408f;}
+.filter-chip.pink.active{background:rgba(224,64,143,.15);border-color:#e0408f;color:#e0408f;}
+.entry-dot.pink{background:#e0408f;}
+.entry-amount.pink{color:#e0408f;}
+.tier-row{display:flex;gap:.45rem;margin-bottom:.85rem;flex-wrap:wrap;}
+.tier-btn{flex:1;min-width:90px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;padding:.6rem;cursor:pointer;text-align:center;touch-action:manipulation;}
+.tier-btn.active{background:rgba(224,64,143,.2);border-color:#e0408f;color:#e0408f;}
+.contractor-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;}
+.contractor-name{font-size:.88rem;font-weight:600;}
+.contractor-total{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:#e0408f;}
+.contractor-flag{font-size:.68rem;color:var(--amber);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -370,6 +386,95 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div class="entry-list" id="cl-list"><div class="empty-state">No clients saved yet.</div></div>
 </div>
 
+<!-- SPARKLE -->
+<div class="page" id="page-sparkle">
+  <div class="page-header">
+    <div class="header-badge sparkle">Sparkle Cleaning</div>
+    <h1 class="sparkle">Sparkle</h1>
+    <p>Separate books for Sparkle Cleaning by LWorks.</p>
+  </div>
+  <div class="summary-row">
+    <div class="summary-card"><div class="sc-label">This Month</div><div class="sc-value pink" id="spk-month">$0</div><div class="sc-sub" id="spk-month-count">0 jobs</div></div>
+    <div class="summary-card"><div class="sc-label">This Year</div><div class="sc-value pink" id="spk-year">$0</div><div class="sc-sub" id="spk-year-count">0 total</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title sparkle">Log a Clean</div>
+    <div class="grid2">
+      <div class="field"><label>Client</label><input type="text" id="spk-customer" placeholder="Taylor Small"></div>
+      <div class="field"><label>Amount</label><input type="number" id="spk-amount" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field">
+      <label>Tier</label>
+      <div class="tier-row">
+        <button type="button" class="tier-btn" data-tier="Standard" onclick="selectTier(this)">Standard</button>
+        <button type="button" class="tier-btn" data-tier="Advanced" onclick="selectTier(this)">Advanced</button>
+        <button type="button" class="tier-btn" data-tier="Deep" onclick="selectTier(this)">Deep</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Date</label><input type="date" id="spk-date"></div>
+      <div class="field"><label>Payment Method</label>
+        <select id="spk-method">
+          <option value="Zelle">Zelle</option><option value="Venmo">Venmo</option>
+          <option value="Cash App">Cash App</option><option value="Cash">Cash</option><option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <button class="add-btn-pink" onclick="addSparkleIncome()">+ Log Clean</button>
+    <div class="status-msg" id="spk-status"></div>
+  </div>
+
+  <div class="list-header"><div class="list-title" style="color:#e0408f">Sparkle Income</div><button class="clear-btn" onclick="clearAll('sparkleIncome')">Clear All</button></div>
+  <div class="filter-row" id="spk-filters"></div>
+  <div class="entry-list" id="spk-list"><div class="empty-state">No cleans logged yet.</div></div>
+
+  <div class="card">
+    <div class="card-title sparkle">Log a Supply Expense</div>
+    <div class="grid2">
+      <div class="field"><label>Description</label><input type="text" id="spke-desc" placeholder="e.g. Cleaning solution, rags"></div>
+      <div class="field"><label>Amount</label><input type="number" id="spke-amount" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="spke-date"></div>
+    <button class="add-btn-pink" onclick="addSparkleExpense()">+ Log Supply Expense</button>
+    <div class="status-msg" id="spke-status"></div>
+  </div>
+  <div class="list-header"><div class="list-title" style="color:#e0408f">Sparkle Supply Expenses</div><button class="clear-btn" onclick="clearAll('sparkleExpenses')">Clear All</button></div>
+  <div class="entry-list" id="spke-list"><div class="empty-state">No supply expenses logged yet.</div></div>
+
+  <div class="card">
+    <div class="card-title sparkle">Contractor Payment (1099)</div>
+    <div class="grid2">
+      <div class="field"><label>Contractor Name</label><input type="text" id="ctr-name" placeholder="Chelsey"></div>
+      <div class="field"><label>Amount Paid</label><input type="number" id="ctr-amount" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="ctr-date"></div>
+    <button class="add-btn-pink" onclick="addContractorPayment()">+ Log Payment to Contractor</button>
+    <div class="status-msg" id="ctr-status"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title sparkle">Contractor Totals (This Year)</div>
+    <div id="contractor-totals"><div class="empty-state">No contractor payments logged yet.</div></div>
+    <div class="mile-sub" style="margin-top:.5rem;">IRS 1099-NEC threshold is $600/contractor/year — flagged above once crossed.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title sparkle">Client Checklist & Policies</div>
+    <div class="mile-sub" style="margin-bottom:.6rem;">Send this to clients before their first clean — covers tiers, prep, exclusions, and cancellation policy.</div>
+    <a href="Sparkle_Cleaning_Checklist_and_Policies.pdf" target="_blank" style="text-decoration:none;">
+      <button type="button" class="export-btn">📄 Open Sparkle Checklist & Policies PDF</button>
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-title sparkle">Export for Taxes</div>
+    <button class="export-btn" onclick="exportCSV('sparkleIncome')">⬇ Export Sparkle Income CSV</button>
+    <button class="export-btn" onclick="exportCSV('sparkleExpenses')">⬇ Export Sparkle Expenses CSV</button>
+    <button class="export-btn" onclick="exportCSV('contractorPayments')">⬇ Export Contractor Payments CSV</button>
+  </div>
+</div>
+
 <!-- PIN LOCK -->
 <div id="pin-screen">
   <div class="pin-badge">LWorks Internal</div>
@@ -405,6 +510,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <button class="tab-btn" onclick="switchTab('income')" id="tab-income"><span class="tab-icon">💰</span>Income</button>
   <button class="tab-btn" onclick="switchTab('expenses')" id="tab-expenses"><span class="tab-icon">🧾</span>Expenses</button>
   <button class="tab-btn" onclick="switchTab('overview')" id="tab-overview"><span class="tab-icon">📊</span>Overview</button>
+  <button class="tab-btn" onclick="switchTab('sparkle')" id="tab-sparkle"><span class="tab-icon">✨</span>Sparkle</button>
 </div>
 
 <script>
@@ -437,7 +543,7 @@ function pinDel(){
 
 emailjs.init('ojcDVPCld5mc6jCXf');
 
-const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage',clients:'lworks_clients_v1'};
+const KEYS={income:'lworks_income_v2',expenses:'lworks_expenses_v2',mileage:'lworks_mileage',clients:'lworks_clients_v1',sparkleIncome:'sparkle_income_v1',sparkleExpenses:'sparkle_expenses_v1',contractorPayments:'sparkle_contractor_payments_v1'};
 function load(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]');}catch{return[];}}
 function loadObj(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'{}');}catch{return{};}}
 function save(k,d){localStorage.setItem(KEYS[k],JSON.stringify(d));}
@@ -461,6 +567,7 @@ function switchTab(tab){
   if(tab==='income')renderIncome();
   if(tab==='expenses')renderExpenses();
   if(tab==='clients')renderClients();
+  if(tab==='sparkle'){renderSparkleIncome();renderSparkleExpenses();renderContractorTotals();}
 }
 
 // INVOICE
@@ -767,6 +874,15 @@ function exportCSV(type){
   if(type==='income'){
     csv='Date,Customer,Email,Address,Services,Amount,Method,Source\n'+data.map(e=>`${e.date},"${e.customer}","${e.email||''}","${e.address||''}","${e.services||''}",${e.amount},${e.method||''},${e.source||''}`).join('\n');
     filename='lworks_income_'+currentYear()+'.csv';
+  }else if(type==='sparkleIncome'){
+    csv='Date,Client,Tier,Amount,Method\n'+data.map(e=>`${e.date},"${e.customer}","${e.tier||''}",${e.amount},${e.method||''}`).join('\n');
+    filename='sparkle_income_'+currentYear()+'.csv';
+  }else if(type==='sparkleExpenses'){
+    csv='Date,Description,Amount\n'+data.map(e=>`${e.date},"${e.desc}",${e.amount}`).join('\n');
+    filename='sparkle_expenses_'+currentYear()+'.csv';
+  }else if(type==='contractorPayments'){
+    csv='Date,Contractor,Amount\n'+data.map(e=>`${e.date},"${e.name}",${e.amount}`).join('\n');
+    filename='sparkle_contractor_payments_'+currentYear()+'.csv';
   }else{
     csv='Date,Description,Category,Amount\n'+data.map(e=>`${e.date},"${e.desc}","${e.category}",${e.amount}`).join('\n');
     filename='lworks_expenses_'+currentYear()+'.csv';
@@ -806,12 +922,144 @@ function restoreBackup(ev){
 }
 
 // DELETE / CLEAR
-function deleteEntry(key,id){if(!confirm('Delete this entry?'))return;save(key,load(key).filter(e=>e.id!==id));key==='income'?renderIncome():renderExpenses();}
-function clearAll(key){if(!confirm('Clear ALL '+key+'? Cannot be undone.'))return;save(key,[]);key==='income'?renderIncome():renderExpenses();}
+function deleteEntry(key,id){
+  if(!confirm('Delete this entry?'))return;
+  save(key,load(key).filter(e=>e.id!==id));
+  if(key==='income')renderIncome();
+  else if(key==='expenses')renderExpenses();
+  else if(key==='sparkleIncome')renderSparkleIncome();
+  else if(key==='sparkleExpenses')renderSparkleExpenses();
+  else if(key==='contractorPayments')renderContractorTotals();
+}
+function clearAll(key){
+  if(!confirm('Clear ALL '+key+'? Cannot be undone.'))return;
+  save(key,[]);
+  if(key==='income')renderIncome();
+  else if(key==='expenses')renderExpenses();
+  else if(key==='sparkleIncome')renderSparkleIncome();
+  else if(key==='sparkleExpenses')renderSparkleExpenses();
+  else if(key==='contractorPayments')renderContractorTotals();
+}
+
+// SPARKLE
+let selectedTier='';
+function selectTier(btn){
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedTier=btn.dataset.tier;
+}
+function addSparkleIncome(){
+  const customer=document.getElementById('spk-customer').value.trim();
+  const amount=parseFloat(document.getElementById('spk-amount').value);
+  const date=document.getElementById('spk-date').value||today();
+  const method=document.getElementById('spk-method').value;
+  const statusEl=document.getElementById('spk-status');
+  if(!customer||!amount||amount<=0){showStatus(statusEl,'error','Client and amount required.');return;}
+  const data=load('sparkleIncome');
+  data.unshift({id:Date.now(),customer,amount,tier:selectedTier,date,method});
+  save('sparkleIncome',data);
+  ['spk-customer','spk-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('spk-date').value='';
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  selectedTier='';
+  showStatus(statusEl,'success',fmt(amount)+' from '+customer+' logged!');
+  renderSparkleIncome();
+}
+let spkFilter='all';
+function renderSparkleIncome(filter){
+  if(filter!==undefined)spkFilter=filter;
+  const data=load('sparkleIncome');
+  const mData=data.filter(e=>monthKey(e.date)===currentMonth());
+  const yData=data.filter(e=>yearKey(e.date)===currentYear());
+  document.getElementById('spk-month').textContent=fmt(mData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('spk-month-count').textContent=mData.length+' job'+(mData.length!==1?'s':'');
+  document.getElementById('spk-year').textContent=fmt(yData.reduce((s,e)=>s+e.amount,0));
+  document.getElementById('spk-year-count').textContent=data.length+' total';
+  const months=[...new Set(data.map(e=>monthKey(e.date)))].filter(Boolean).sort().reverse();
+  document.getElementById('spk-filters').innerHTML=['all',...months].map(m=>`<div class="filter-chip pink ${spkFilter===m?'active':''}" onclick="renderSparkleIncome('${m}')">${m==='all'?'All':formatMonth(m)}</div>`).join('');
+  const filtered=spkFilter==='all'?data:data.filter(e=>monthKey(e.date)===spkFilter);
+  const list=document.getElementById('spk-list');
+  if(!filtered.length){list.innerHTML='<div class="empty-state">No cleans logged yet.</div>';return;}
+  list.innerHTML=filtered.map(e=>`
+    <div class="entry">
+      <div class="entry-dot pink"></div>
+      <div class="entry-info">
+        <div class="entry-name">${e.customer}${e.tier?' · '+e.tier:''}</div>
+        <div class="entry-meta">${e.date} · ${e.method||''}</div>
+      </div>
+      <div class="entry-amount pink">${fmt(e.amount)}</div>
+      <button class="entry-delete" onclick="deleteEntry('sparkleIncome',${e.id})">✕</button>
+    </div>`).join('');
+}
+
+function addSparkleExpense(){
+  const desc=document.getElementById('spke-desc').value.trim();
+  const amount=parseFloat(document.getElementById('spke-amount').value);
+  const date=document.getElementById('spke-date').value||today();
+  const statusEl=document.getElementById('spke-status');
+  if(!desc||!amount||amount<=0){showStatus(statusEl,'error','Description and amount required.');return;}
+  const data=load('sparkleExpenses');
+  data.unshift({id:Date.now(),desc,amount,date});
+  save('sparkleExpenses',data);
+  ['spke-desc','spke-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('spke-date').value='';
+  showStatus(statusEl,'success',fmt(amount)+' supply expense logged!');
+  renderSparkleExpenses();
+}
+function renderSparkleExpenses(){
+  const data=load('sparkleExpenses');
+  const list=document.getElementById('spke-list');
+  if(!data.length){list.innerHTML='<div class="empty-state">No supply expenses logged yet.</div>';return;}
+  list.innerHTML=data.map(e=>`
+    <div class="entry">
+      <div class="entry-dot pink"></div>
+      <div class="entry-info">
+        <div class="entry-name">${e.desc}</div>
+        <div class="entry-meta">${e.date}</div>
+      </div>
+      <div class="entry-amount pink">${fmt(e.amount)}</div>
+      <button class="entry-delete" onclick="deleteEntry('sparkleExpenses',${e.id})">✕</button>
+    </div>`).join('');
+}
+
+// CONTRACTOR PAYMENTS (1099 tracking)
+function addContractorPayment(){
+  const name=document.getElementById('ctr-name').value.trim();
+  const amount=parseFloat(document.getElementById('ctr-amount').value);
+  const date=document.getElementById('ctr-date').value||today();
+  const statusEl=document.getElementById('ctr-status');
+  if(!name||!amount||amount<=0){showStatus(statusEl,'error','Contractor name and amount required.');return;}
+  const data=load('contractorPayments');
+  data.unshift({id:Date.now(),name,amount,date});
+  save('contractorPayments',data);
+  ['ctr-name','ctr-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ctr-date').value='';
+  showStatus(statusEl,'success',fmt(amount)+' payment to '+name+' logged!');
+  renderContractorTotals();
+}
+function renderContractorTotals(){
+  const data=load('contractorPayments').filter(e=>yearKey(e.date)===currentYear());
+  const totals={};
+  data.forEach(e=>{totals[e.name]=(totals[e.name]||0)+e.amount;});
+  const el=document.getElementById('contractor-totals');
+  const names=Object.keys(totals);
+  if(!names.length){el.innerHTML='<div class="empty-state">No contractor payments logged yet.</div>';return;}
+  el.innerHTML=names.sort((a,b)=>totals[b]-totals[a]).map(name=>`
+    <div class="contractor-card">
+      <div>
+        <div class="contractor-name">${name}</div>
+        ${totals[name]>=600?'<div class="contractor-flag">⚠ Over $600 — 1099-NEC required</div>':''}
+      </div>
+      <div class="contractor-total">${fmt(totals[name])}</div>
+    </div>`).join('');
+}
 
 // INIT
 document.getElementById('inc-date').value=today();
 document.getElementById('exp-date').value=today();
+document.getElementById('spk-date').value=today();
+document.getElementById('spke-date').value=today();
+document.getElementById('ctr-date').value=today();
 renderIncome();renderExpenses();renderClients();
 </script>
 </body>
