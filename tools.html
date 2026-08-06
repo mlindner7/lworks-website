@@ -400,6 +400,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 
   <div class="card">
     <div class="card-title sparkle">Send Invoice to Client</div>
+    <div class="field" id="spi-client-wrap" style="display:none"><label>⚡ Quick-fill saved client</label><select id="spi-client-picker" onchange="pickClient('spi',this.value)"></select></div>
     <div class="grid2">
       <div class="field"><label>Client Name</label><input type="text" id="spi-name" placeholder="Taylor Small"></div>
       <div class="field"><label>Phone</label><input type="tel" id="spi-phone" placeholder="262-555-1234"></div>
@@ -711,7 +712,7 @@ function upsertClient(c){
 function refreshClientPickers(){
   const list=load('clients').slice().sort((a,b)=>a.name.localeCompare(b.name));
   const opts='<option value="">— Returning client —</option>'+list.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  ['inv','inc'].forEach(p=>{
+  ['inv','inc','spi'].forEach(p=>{
     const sel=document.getElementById(p+'-client-picker');
     const wrap=document.getElementById(p+'-client-wrap');
     if(!sel||!wrap)return;
@@ -727,6 +728,11 @@ function pickClient(which,id){
     document.getElementById('cust-name').value=c.name||'';
     document.getElementById('cust-email').value=c.email||'';
     document.getElementById('cust-address').value=c.address||'';
+  }else if(which==='spi'){
+    document.getElementById('spi-name').value=c.name||'';
+    document.getElementById('spi-email').value=c.email||'';
+    document.getElementById('spi-phone').value=c.phone||'';
+    document.getElementById('spi-address').value=c.address||'';
   }else{
     document.getElementById('inc-customer').value=c.name||'';
   }
@@ -1007,7 +1013,7 @@ async function sendSparkleInvoice(){
     data.unshift({id:Date.now(),customer:name,amount:parseFloat(total),tier:selectedInvTier,date:today(),method:'Invoice',source:'invoice'});
     save('sparkleIncome',data);
 
-    upsertClient(name,email,phone,address);
+    upsertClient({name,email,phone,address});
 
     showStatus(statusEl,'success','Invoice sent & logged \u2014 '+fmt(total)+' from '+name);
     btn.textContent='Send Invoice to Client';btn.disabled=false;
@@ -1019,19 +1025,6 @@ async function sendSparkleInvoice(){
     showStatus(statusEl,'error','Failed to send. Check connection and try again.');
     btn.textContent='Send Invoice to Client';btn.disabled=false;
   }
-}
-function upsertClient(name,email,phone,address){
-  if(!name)return;
-  const list=load('clients');
-  const existing=list.find(c=>(email&&c.email&&c.email.toLowerCase()===email.toLowerCase())||(c.name&&c.name.toLowerCase()===name.toLowerCase()));
-  if(existing){
-    if(email)existing.email=email;
-    if(phone)existing.phone=phone;
-    if(address)existing.address=address;
-  }else{
-    list.push({id:Date.now(),name,email,phone,address,notes:''});
-  }
-  save('clients',list);
 }
 function addSparkleIncome(){
   const customer=document.getElementById('spk-customer').value.trim();
@@ -1145,7 +1138,7 @@ document.getElementById('exp-date').value=today();
 document.getElementById('spk-date').value=today();
 document.getElementById('spke-date').value=today();
 document.getElementById('ctr-date').value=today();
-renderIncome();renderExpenses();renderClients();
+renderIncome();renderExpenses();renderClients();refreshClientPickers();
 </script>
 </body>
 </html>
