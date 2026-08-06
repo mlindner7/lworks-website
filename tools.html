@@ -399,6 +399,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 
   <div class="card">
+    <div class="card-title sparkle">Send Invoice to Client</div>
+    <div class="grid2">
+      <div class="field"><label>Client Name</label><input type="text" id="spi-name" placeholder="Taylor Small"></div>
+      <div class="field"><label>Phone</label><input type="tel" id="spi-phone" placeholder="262-555-1234"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Client Email</label><input type="email" id="spi-email" placeholder="taylor@email.com"></div>
+      <div class="field"><label>Address</label><input type="text" id="spi-address" placeholder="123 Main St, Sussex, WI"></div>
+    </div>
+    <div class="field">
+      <label>Tier</label>
+      <div class="tier-row">
+        <button type="button" class="tier-btn" data-tier="Standard" onclick="selectInvTier(this)">Standard</button>
+        <button type="button" class="tier-btn" data-tier="Advanced" onclick="selectInvTier(this)">Advanced</button>
+        <button type="button" class="tier-btn" data-tier="Deep" onclick="selectInvTier(this)">Deep</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Total Amount</label>
+      <div class="price-wrap"><span>$</span><input type="number" id="spi-total" placeholder="0.00" min="0" step="0.01"></div>
+    </div>
+    <div class="field"><label>Notes (Optional)</label><textarea id="spi-notes" placeholder="Job notes, follow-up items..."></textarea></div>
+    <button type="button" class="add-btn-pink" id="spi-send-btn" onclick="sendSparkleInvoice()">Send Invoice to Client</button>
+    <div class="status-msg" id="spi-status"></div>
+  </div>
+
+  <div class="card">
     <div class="card-title sparkle">Log a Clean</div>
     <div class="grid2">
       <div class="field"><label>Client</label><input type="text" id="spk-customer" placeholder="Taylor Small"></div>
@@ -944,9 +971,67 @@ function clearAll(key){
 // SPARKLE
 let selectedTier='';
 function selectTier(btn){
-  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#page-sparkle .card:nth-of-type(2) .tier-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   selectedTier=btn.dataset.tier;
+}
+let selectedInvTier='';
+function selectInvTier(btn){
+  document.querySelectorAll('#page-sparkle .card:nth-of-type(1) .tier-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedInvTier=btn.dataset.tier;
+}
+async function sendSparkleInvoice(){
+  const name=document.getElementById('spi-name').value.trim();
+  const email=document.getElementById('spi-email').value.trim();
+  const phone=document.getElementById('spi-phone').value.trim();
+  const address=document.getElementById('spi-address').value.trim();
+  const total=document.getElementById('spi-total').value.trim();
+  const notes=document.getElementById('spi-notes').value.trim();
+  const statusEl=document.getElementById('spi-status');
+
+  if(!name||!email||!total||!selectedInvTier){showStatus(statusEl,'error','Fill in name, email, tier, and total.');return;}
+
+  const btn=document.getElementById('spi-send-btn');
+  btn.disabled=true;btn.textContent='Sending...';
+
+  try{
+    await emailjs.send('service_6ethcqb','template_cezqhvi',{
+      customer_name:name,customer_email:email,
+      services:'Sparkle Cleaning \u2014 '+selectedInvTier+' Clean',
+      total:'$'+parseFloat(total).toFixed(2),
+      notes:notes||''
+    });
+
+    const data=load('sparkleIncome');
+    data.unshift({id:Date.now(),customer:name,amount:parseFloat(total),tier:selectedInvTier,date:today(),method:'Invoice',source:'invoice'});
+    save('sparkleIncome',data);
+
+    upsertClient(name,email,phone,address);
+
+    showStatus(statusEl,'success','Invoice sent & logged \u2014 '+fmt(total)+' from '+name);
+    btn.textContent='Send Invoice to Client';btn.disabled=false;
+    ['spi-name','spi-email','spi-phone','spi-address','spi-total','spi-notes'].forEach(id=>document.getElementById(id).value='');
+    document.querySelectorAll('#page-sparkle .card:nth-of-type(1) .tier-btn').forEach(b=>b.classList.remove('active'));
+    selectedInvTier='';
+    renderSparkleIncome();
+  }catch(err){
+    showStatus(statusEl,'error','Failed to send. Check connection and try again.');
+    btn.textContent='Send Invoice to Client';btn.disabled=false;
+  }
+}
+function upsertClient(name,email,phone,address){
+  if(!name)return;
+  const list=load('clients');
+  const existing=list.find(c=>(email&&c.email&&c.email.toLowerCase()===email.toLowerCase())||(c.name&&c.name.toLowerCase()===name.toLowerCase()));
+  if(existing){
+    if(email)existing.email=email;
+    if(phone)existing.phone=phone;
+    if(address)existing.address=address;
+  }else{
+    list.push({id:Date.now(),name,email,phone,address,notes:''});
+  }
+  save('clients',list);
 }
 function addSparkleIncome(){
   const customer=document.getElementById('spk-customer').value.trim();
