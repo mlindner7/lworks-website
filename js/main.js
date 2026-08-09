@@ -540,26 +540,77 @@ async function submitInfo() {
     console.error('EmailJS error:', e);
   }
 
-  // Prefill Calendly with the name + email they already entered (no retyping)
-  let bookingUrl = calendlyRoute || CONFIG.calendly.base;
-  try {
-    const prefill = new URLSearchParams({
-      name: `${userData.firstName} ${userData.lastName}`.trim(),
-      email: userData.email
-    });
-    bookingUrl += (bookingUrl.includes('?') ? '&' : '?') + prefill.toString();
-  } catch (e) { /* fall back to plain route */ }
-
   // Show success + Calendly link
   document.getElementById('p4').innerHTML = `
     <div class="result" style="text-align:center;padding:16px 0;">
       <div class="chk">✓</div>
       <div class="ft" style="margin-bottom:8px;">You're all set, ${userData.firstName}!</div>
       <p style="color:var(--mid);font-size:13px;margin-bottom:24px;">Your estimate has been sent to ${userData.email}. Pick a time below and we'll confirm everything before the job.</p>
-      <a href="${bookingUrl}" target="_blank" rel="noopener" class="btn-primary" style="margin-bottom:16px;">📅 Book My Appointment</a>
+      <a href="${calendlyRoute}" target="_blank" rel="noopener" class="btn-primary" style="margin-bottom:16px;">📅 Book My Appointment</a>
       <br/><br/>
       <button onclick="resetTool()" style="background:none;border:none;color:var(--mid);font-size:13px;font-weight:700;cursor:pointer;padding:10px;">← Start Over</button>
     </div>`;
+}
+
+// =============================================
+// SPARKLE CLEANING LEAD FORM
+// =============================================
+function toggleSparkleForm() {
+  const f = document.getElementById('sparkleForm');
+  if (f) {
+    f.classList.toggle('open');
+    if (f.classList.contains('open')) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+async function submitSparkleLead() {
+  const name = document.getElementById('spname').value.trim();
+  const phone = document.getElementById('spphone').value.trim();
+  const email = document.getElementById('spemail').value.trim();
+  const address = document.getElementById('spaddress').value.trim();
+  const notes = document.getElementById('spnotes').value.trim();
+  const resultEl = document.getElementById('sparkleResult');
+
+  if (!name || (!phone && !email) || !address) {
+    resultEl.innerHTML = '<p style="color:#c0392b;font-size:12px;margin-top:10px;">Please enter your name, address, and at least a phone or email.</p>';
+    return;
+  }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    resultEl.innerHTML = '<p style="color:#c0392b;font-size:12px;margin-top:10px;">Please enter a valid email address.</p>';
+    return;
+  }
+
+  const btn = document.getElementById('sparkleSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  try {
+    await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, {
+      from_name: name,
+      from_email: email || 'Not provided',
+      phone: phone || 'Not provided',
+      address: address,
+      services: 'Sparkle Cleaning — Free Walkthrough Requested',
+      property_size: 'N/A',
+      property_type: 'N/A',
+      stories: 'N/A',
+      estimate_low: 'TBD after walkthrough',
+      estimate_high: 'TBD after walkthrough',
+      bundle_discount: 'N/A',
+      contact_preference: phone ? 'Phone' : 'Email',
+      photo_url: 'N/A',
+      carpet_rooms: 'N/A',
+      haul_load: 'N/A',
+      vehicle: 'N/A',
+      notes: notes || 'No additional notes'
+    });
+    resultEl.innerHTML = '<p style="color:var(--g);font-size:12px;margin-top:10px;font-weight:700;">✓ Request sent! We\'ll reach out soon to schedule your free walkthrough.</p>';
+    ['spname','spphone','spemail','spaddress','spnotes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  } catch (e) {
+    console.error('EmailJS error:', e);
+    resultEl.innerHTML = '<p style="color:#c0392b;font-size:12px;margin-top:10px;">Something went wrong — please call/text us at (262) 225-1191 instead.</p>';
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Send My Request →'; }
 }
 
 // =============================================
