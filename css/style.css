@@ -47,7 +47,7 @@ body{font-family:var(--fn);font-size:16px;color:var(--dk);background:var(--bg);l
 .td-pu{background:linear-gradient(135deg,var(--p),var(--b)) !important;}
 
 /* SERVICES SECTION */
-.services{padding:44px 24px 36px;background:var(--bg);}
+.services{padding:44px 24px 0;background:var(--bg);}
 .sec-label{text-align:center;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--b);margin-bottom:10px;}
 .sec-title{text-align:center;font-family:var(--fd);font-size:40px;font-weight:800;color:var(--dk);margin-bottom:8px;}
 .sec-sub{text-align:center;color:var(--mid);font-size:16px;margin-bottom:40px;}
@@ -209,7 +209,7 @@ textarea:focus{outline:none;border-color:var(--b);}
 .photo-upload-sub{font-size:11px;color:var(--lt);}
 
 /* SPARKLE SECTION */
-.sparkle-sec{padding:8px 24px 44px;background:linear-gradient(135deg,#fff0f7 0%,#fff 60%);}
+.sparkle-sec{padding:0 24px 44px;background:linear-gradient(135deg,#fff0f7 0%,#fff 60%);}
 .sparkle-wrap{max-width:1000px;margin:0 auto;}
 .sparkle-sub{text-align:center;color:var(--mid);font-size:14px;max-width:520px;margin:0 auto 36px;line-height:1.7;}
 .sparkle-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
@@ -289,3 +289,8 @@ textarea:focus{outline:none;border-color:var(--b);}
   .sparkle-wide-body{align-items:center;text-align:center;}
   .sparkle-wide-text{text-align:center;}
 }
+
+/* tiers flush under sparkle card */
+.card.sparkle-wide{margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;}
+.sparkle-sec{background:linear-gradient(180deg,#fff 0%,#fff0f7 100%);}
+.sparkle-tiers{padding-top:14px;}
