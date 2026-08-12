@@ -38,7 +38,7 @@ body{font-family:var(--fn);font-size:16px;color:var(--dk);background:var(--bg);l
 .hero-right{display:none !important;}
 .hero-left{padding:48px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;max-width:600px;width:100%;}
 .pill{display:inline-flex;align-items:center;gap:6px;background:#eef6ff;color:#1a6bb5;border:1px solid #bee0f7;border-radius:50px;padding:7px 18px;font-size:14px;font-weight:700;margin-bottom:18px;letter-spacing:.04em;}
-.hero-wordmark-img{width:380px;height:auto;display:block;max-width:90%;margin:0 auto 20px;}
+.hero-wordmark-img{width:470px;height:auto;display:block;max-width:90%;margin:0 auto 20px;}
 .hero-sub{font-family:var(--fd);font-size:26px;font-weight:700;letter-spacing:.02em;color:var(--mid);max-width:520px;margin:8px auto 26px;line-height:1.4;}
 .hero-btns{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;}
 .trust{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
@@ -235,7 +235,7 @@ textarea:focus{outline:none;border-color:var(--b);}
 @media(max-width:768px){
   .hero{min-height:auto;padding:0;}
   .hero-left{padding:28px 20px 32px;align-items:center;text-align:center;}
-  .hero-wordmark-img{width:320px;}
+  .hero-wordmark-img{width:360px;}
   .hero-sub{text-align:center;}
   .hero-btns{justify-content:center;}
   .trust{justify-content:center;}
@@ -253,18 +253,18 @@ textarea:focus{outline:none;border-color:var(--b);}
 @media(max-width:480px){
   .cards{grid-template-columns:1fr;}
   .ecta-btns{flex-direction:column;}
-  .hero-wordmark-img{width:290px;}
+  .hero-wordmark-img{width:300px;}
 }
 
 /* SPARKLE LOGO BAND + WIDE CARD */
-.sparkle-band-logo{height:84px;width:auto;display:block;}
+.sparkle-band-logo{height:70px;width:auto;display:block;}
 .card.sparkle-wide{margin-top:14px;}
 .sparkle-wide-body{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
 .sparkle-wide-text{flex:1;min-width:260px;}
 .sparkle-wide-desc{font-size:15px;color:var(--mid);line-height:1.6;margin:0;}
 .sparkle-wide-btn{flex-shrink:0;}
 @media(max-width:768px){
-  .sparkle-band-logo{height:70px;}
+  .sparkle-band-logo{height:58px;}
   .sparkle-wide-body{flex-direction:column;align-items:flex-start;}
   .sparkle-wide-btn{width:100%;justify-content:center;}
   .hero-sub{font-size:21px;}
@@ -274,8 +274,8 @@ textarea:focus{outline:none;border-color:var(--b);}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
 /* NAV SPARKLE */
-.nav-links a.nav-sparkle{color:var(--pk);font-weight:800;}
-.nav-links a.nav-sparkle:hover{color:var(--pk-deep);background:var(--pk-blush);}
+.nav-links a.nav-sparkle{background:linear-gradient(135deg,var(--pk),var(--pk-deep));color:#fff !important;border-radius:50px;padding:8px 18px;font-weight:800;}
+.nav-links a.nav-sparkle:hover{background:linear-gradient(135deg,var(--pk-deep),var(--pk));color:#fff !important;}
 
 /* SPARKLE CARD REFINEMENTS */
 .card.sparkle-wide{margin-top:20px;}
@@ -294,3 +294,6 @@ textarea:focus{outline:none;border-color:var(--b);}
 .card.sparkle-wide{margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;}
 .sparkle-sec{background:linear-gradient(180deg,#fff 0%,#fff0f7 100%);}
 .sparkle-tiers{padding-top:14px;}
+
+/* anchor offset so nav lands on the card, not past it */
+#sparkle-top{scroll-margin-top:90px;}
